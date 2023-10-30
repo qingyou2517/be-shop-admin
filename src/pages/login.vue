@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted, onBeforeMount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
+import { ElNotification } from "element-plus";
+import { login, getInfo } from "../api/manager";
+import { useRouter } from "vue-router";
+import { useCookies } from "@vueuse/integrations/useCookies";
+
+const router = useRouter();
+
 const form = reactive({
   username: "",
   password: "",
@@ -29,14 +36,29 @@ const rules = {
   ],
 };
 const formRef = ref();
-const onSubmit = async () => {
+const onSubmit = () => {
   if (!formRef.value) return; // 若formRef为空，不必校验内容
 
-  await formRef.value.validate((vaild) => {
+  formRef.value.validate(async (vaild) => {
     if (!vaild) {
       return false;
     }
-    console.log("验证通过！");
+    let loginRes = await login(form.username, form.password);
+    ElNotification({
+      type: "success",
+      message: "登录成功",
+      duration: 3000,
+    });
+
+    // token 存入 cookie（前端发送的请求要携带token，token从cookie取）
+    const cookie = useCookies();
+    cookie.set("admin-token", loginRes.token);
+
+    // 获取用户相关信息
+    let userInfo = await getInfo();
+    console.log(userInfo);
+
+    router.push("/");
   });
 };
 </script>
