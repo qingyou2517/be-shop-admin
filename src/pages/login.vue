@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onBeforeMount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
-import { ElNotification } from "element-plus";
 import { login, getInfo } from "../api/manager";
 import { useRouter } from "vue-router";
-import { useCookies } from "@vueuse/integrations/useCookies";
+import { setToken } from "~/composables/auth";
+import { toast } from "~/composables/util";
 
 const router = useRouter();
 
@@ -44,15 +44,10 @@ const onSubmit = () => {
       return false;
     }
     let loginRes = await login(form.username, form.password);
-    ElNotification({
-      type: "success",
-      message: "登录成功",
-      duration: 3000,
-    });
+    toast("登录成功", "success");
 
     // token 存入 cookie（前端发送的请求要携带token，token从cookie取）
-    const cookie = useCookies();
-    cookie.set("admin-token", loginRes.token);
+    setToken("admin-token", loginRes.token);
 
     // 获取用户相关信息
     let userInfo = await getInfo();
