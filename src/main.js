@@ -13,5 +13,6 @@ app.use(ElementPlus);
 app.use(router);
 
 import "virtual:windi.css";
+import "nprogress/nprogress.css";
 
 app.mount("#app");
