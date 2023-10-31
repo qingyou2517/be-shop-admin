@@ -20,7 +20,7 @@ const onLogout = () => {
 </script>
 
 <template>
-  <div>后台首页</div>
+  这是index
   <div>{{ $store.state.user.username }}</div>
   <el-button type="primary" @click="onLogout">退出登录</el-button>
 </template>

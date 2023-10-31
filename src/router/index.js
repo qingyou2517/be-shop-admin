@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import Admin from "../layouts/admin.vue";
 import Index from "~/pages/index.vue";
 import NotFound from "~/pages/404.vue";
 import Login from "~/pages/login.vue";
@@ -7,16 +8,22 @@ import Login from "~/pages/login.vue";
 const routes = [
   {
     path: "/",
-    component: Index,
-    meta: {
-      title: "首页",
-    },
+    component: Admin,
+    children: [
+      {
+        path: "/",
+        component: Index,
+        meta: {
+          title: "首页",
+        },
+      },
+    ],
   },
   {
     path: "/login",
     component: Login,
     meta: {
-      title: "登录页",
+      title: "登录",
     },
   },
   // 将匹配所有内容并将其放在 `$route.params.pathMatch` 下
