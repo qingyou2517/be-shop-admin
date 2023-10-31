@@ -3,10 +3,12 @@ import { ref, reactive, onMounted, onBeforeMount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
 import { login, getInfo } from "../api/manager";
 import { useRouter } from "vue-router";
-import { setToken } from "~/composables/auth";
-import { toast } from "~/composables/util";
+import { setToken } from "../composables/auth";
+import { toast } from "../composables/util";
+import { useStore } from "vuex";
 
 const router = useRouter();
+const store = useStore();
 
 const form = reactive({
   username: "",
@@ -51,7 +53,7 @@ const onSubmit = () => {
 
     // 获取用户相关信息
     let userInfo = await getInfo();
-    console.log(userInfo);
+    store.commit("SET_USERINFO", userInfo);
 
     router.push("/");
   });
