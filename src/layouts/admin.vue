@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from "vue";
 import FHeader from "./components/FHeader.vue";
 import FMenu from "./components/FMenu.vue";

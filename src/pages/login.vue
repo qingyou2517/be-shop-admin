@@ -1,12 +1,10 @@
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
-import { toast } from "../composables/util";
-import { useStore } from "vuex";
-
-const router = useRouter();
-const store = useStore();
+import { toast } from "~/composables/util";
+import store from "~/store";
+import router from "../router";
 
 const form = reactive({
   username: "",
@@ -25,13 +23,6 @@ const rules = {
       required: true,
       message: "密码不能为空",
       trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-    {
-      min: 3,
-      max: 12,
-      required: true,
-      message: "密码必须是3~12个字符",
-      trigger: "blur",
     },
   ],
 };
@@ -111,7 +102,7 @@ onBeforeUnmount(() => {
             type="password"
             show-password
             v-model="form.password"
-            placeholder="请输入3~12位密码"
+            placeholder="请输入密码"
           >
             <template #prefix>
               <el-icon :prefix-icon="Lock"><lock /></el-icon>

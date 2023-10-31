@@ -17,3 +17,12 @@ export function getInfo() {
 export function logout() {
   return axios.post("/admin/logout");
 }
+
+// 修改密码
+export function updatePassword({ oldpassword, password, repassword }) {
+  return axios.post("/admin/updatepassword", {
+    oldpassword,
+    password,
+    repassword,
+  });
+}
