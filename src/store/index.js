@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
-import { login, getInfo } from "../api/manager";
-import { setToken } from "~/composables/auth";
+import { login, getInfo, logout } from "../api/manager";
+import { setToken, removeToken } from "~/composables/auth";
 
 const store = createStore({
   state() {
@@ -35,6 +35,19 @@ const store = createStore({
         getInfo()
           .then((res) => {
             commit("SET_USERINFO", res); // 异步提交mutations
+            resolve(res);
+          })
+          .catch((err) => reject(err));
+      });
+    },
+
+    // 退出登录
+    userLogout({ commit }) {
+      return new Promise((resolve, reject) => {
+        logout()
+          .then((res) => {
+            removeToken();
+            commit("SET_USERINFO", {});
             resolve(res);
           })
           .catch((err) => reject(err));
