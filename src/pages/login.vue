@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeMount } from "vue";
+import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
-import { login, getInfo } from "../api/manager";
 import { useRouter } from "vue-router";
-import { setToken } from "../composables/auth";
 import { toast } from "../composables/util";
 import { useStore } from "vuex";
 
@@ -38,26 +36,37 @@ const rules = {
   ],
 };
 const formRef = ref();
+const loading = ref(false);
 const onSubmit = () => {
   if (!formRef.value) return; // 若formRef为空，不必校验内容
 
-  formRef.value.validate(async (vaild) => {
-    if (!vaild) {
-      return false;
-    }
-    let loginRes = await login(form.username, form.password);
-    toast("登录成功", "success");
-
-    // token 存入 cookie（前端发送的请求要携带token，token从cookie取）
-    setToken("admin-token", loginRes.token);
-
-    // 获取用户相关信息
-    let userInfo = await getInfo();
-    store.commit("SET_USERINFO", userInfo);
-
-    router.push("/");
+  formRef.value.validate((vaild) => {
+    if (!vaild) return false;
+    loading.value = true;
+    store
+      .dispatch("userLogin", form)
+      .then((res) => {
+        toast("登录成功", "success");
+        router.push("/");
+      })
+      .finally(() => {
+        loading.value = false; // .finally与前面.then的状态无关
+      });
   });
 };
+
+// 监听回车事件
+const onEnter = (e) => {
+  if (e.key === "Enter") onSubmit();
+};
+// 页面加载完毕，监听键盘事件
+onMounted(() => {
+  document.addEventListener("keyup", onEnter);
+});
+// 页面销毁之前，移除键盘事件监听
+onBeforeUnmount(() => {
+  document.removeEventListener("keyup", onEnter);
+});
 </script>
 
 <template>
@@ -116,6 +125,7 @@ const onSubmit = () => {
             class="w-[250px]"
             type="primary"
             @click="onSubmit"
+            :loading="loading"
             >登 录</el-button
           >
         </el-form-item>
