@@ -1,15 +1,12 @@
 <script setup>
-import { ref, reactive } from "vue";
-import { toast, showModal } from "~/composables/util";
-import store from "~/store";
-import router from "~/router";
 import { useFullscreen } from "@vueuse/core";
-import { updatePassword } from "~/api/manager";
+import { useRePassword, useLogout } from "~/composables/useManager";
 import FormDrawer from "~/components/FormDrawer.vue";
 
 const { isFullscreen, toggle } = useFullscreen();
-
-const formDrawerRef = ref(null);
+const { formDrawerRef, form, rules, formRef, openRePasswordDrawer, onSubmit } =
+  useRePassword();
+const { onLogout } = useLogout();
 
 const handleCommand = (command) => {
   switch (command) {
@@ -17,7 +14,7 @@ const handleCommand = (command) => {
       onLogout();
       break;
     case "rePassword":
-      formDrawerRef.value.open();
+      openRePasswordDrawer();
       break;
     default:
       break;
@@ -26,64 +23,6 @@ const handleCommand = (command) => {
 
 const onRefresh = () => location.reload();
 const toggleScreen = () => toggle();
-
-const onLogout = () => {
-  showModal("是否退出登录?", "warning")
-    .then((res) => {
-      store.dispatch("userLogout").then((res) => {
-        toast("已退出登录", "success");
-        router.push("/login");
-      });
-    })
-    .catch((err) => {});
-};
-
-const form = reactive({
-  oldpassword: "",
-  password: "",
-  repassword: "",
-});
-const rules = {
-  oldpassword: [
-    {
-      required: true,
-      message: "旧密码不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-  password: [
-    {
-      required: true,
-      message: "新密码不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-  repassword: [
-    {
-      required: true,
-      message: "确认密码不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-};
-const formRef = ref();
-const onSubmit = () => {
-  if (!formRef.value) return; // 若formRef为空，不必校验内容
-  formRef.value.validate((vaild) => {
-    if (!vaild) return false;
-    formDrawerRef.value.showLoading();
-
-    updatePassword(form)
-      .then((res) => {
-        toast("已修改密码，请重新登录", "success");
-        store.dispatch("userLogout");
-        router.push("/login");
-      })
-      .finally(() => {
-        formDrawerRef.value.hideLoading();
-      });
-  });
-};
 </script>
 
 <template>
