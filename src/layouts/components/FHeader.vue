@@ -1,15 +1,15 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { toast, showModal } from "~/composables/util";
-import { useRouter } from "vue-router";
 import store from "~/store";
+import router from "~/router";
 import { useFullscreen } from "@vueuse/core";
 import { updatePassword } from "~/api/manager";
+import FormDrawer from "~/components/FormDrawer.vue";
 
 const { isFullscreen, toggle } = useFullscreen();
 
-const router = useRouter();
-const showDrawer = ref(false);
+const formDrawerRef = ref(null);
 
 const handleCommand = (command) => {
   switch (command) {
@@ -17,7 +17,7 @@ const handleCommand = (command) => {
       onLogout();
       break;
     case "rePassword":
-      showDrawer.value = true;
+      formDrawerRef.value.open();
       break;
     default:
       break;
@@ -67,12 +67,11 @@ const rules = {
   ],
 };
 const formRef = ref();
-const loading = ref(false);
 const onSubmit = () => {
   if (!formRef.value) return; // 若formRef为空，不必校验内容
   formRef.value.validate((vaild) => {
     if (!vaild) return false;
-    loading.value = true;
+    formDrawerRef.value.showLoading();
 
     updatePassword(form)
       .then((res) => {
@@ -81,7 +80,7 @@ const onSubmit = () => {
         router.push("/login");
       })
       .finally(() => {
-        loading.value = false;
+        formDrawerRef.value.hideLoading();
       });
   });
 };
@@ -140,42 +139,36 @@ const onSubmit = () => {
       </el-dropdown>
     </div>
   </div>
-  <el-drawer
-    v-model="showDrawer"
+
+  <FormDrawer
+    ref="formDrawerRef"
     title="修改密码"
-    size="45%"
-    :close-on-click-modal="false"
+    destroy-on-close
+    @submit="onSubmit"
   >
-    <span>
-      <el-form ref="formRef" :rules="rules" :model="form" label-width="80px">
-        <el-form-item prop="oldpassword" label="旧密码">
-          <el-input v-model="form.oldpassword" placeholder="请输入旧密码">
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password" label="新密码">
-          <el-input
-            type="password"
-            show-password
-            v-model="form.password"
-            placeholder="请输入新密码"
-          ></el-input>
-        </el-form-item>
-        <el-form-item prop="repassword" label="确认密码">
-          <el-input
-            type="password"
-            show-password
-            v-model="form.repassword"
-            placeholder="请再输入一次新密码"
-          ></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="onSubmit" :loading="loading"
-            >提交</el-button
-          >
-        </el-form-item>
-      </el-form>
-    </span>
-  </el-drawer>
+    <el-form ref="formRef" :rules="rules" :model="form" label-width="80px">
+      <el-form-item prop="oldpassword" label="旧密码">
+        <el-input v-model="form.oldpassword" placeholder="请输入旧密码">
+        </el-input>
+      </el-form-item>
+      <el-form-item prop="password" label="新密码">
+        <el-input
+          type="password"
+          show-password
+          v-model="form.password"
+          placeholder="请输入新密码"
+        ></el-input>
+      </el-form-item>
+      <el-form-item prop="repassword" label="确认密码">
+        <el-input
+          type="password"
+          show-password
+          v-model="form.repassword"
+          placeholder="请再输入一次新密码"
+        ></el-input>
+      </el-form-item>
+    </el-form>
+  </FormDrawer>
 </template>
 
 <style scoped>
