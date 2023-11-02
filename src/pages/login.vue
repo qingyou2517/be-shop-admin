@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
 import { toast } from "~/composables/util";
 import store from "~/store";
 import router from "../router";

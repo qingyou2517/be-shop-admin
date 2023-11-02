@@ -2,7 +2,7 @@
 import { ref, reactive } from "vue";
 import FHeader from "./components/FHeader.vue";
 import FMenu from "./components/FMenu.vue";
-import FTagList from "./components/FTagList.vue";
+import FTagList from "~/layouts/components/FTagList.vue";
 </script>
 
 <template>
@@ -11,7 +11,10 @@ import FTagList from "./components/FTagList.vue";
       <FHeader></FHeader>
     </el-header>
     <el-container>
-      <el-aside>
+      <el-aside
+        :style="{ width: $store.state.asideWidth }"
+        class="transition-all duration-200"
+      >
         <FMenu></FMenu>
       </el-aside>
       <el-main>

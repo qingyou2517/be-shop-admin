@@ -6,12 +6,27 @@ const store = createStore({
   state() {
     return {
       user: {}, // 用户信息
+      asideWidth: "250px", // 默认展开侧边栏，宽度为250px
+      menus: [],
+      ruleNames: [],
     };
   },
   mutations: {
+    // 记录用户信息
     SET_USERINFO(state, user) {
-      // 记录用户信息
       state.user = user;
+    },
+    // 展开/收起侧边栏
+    SET_ASIDE_WIDTH(state) {
+      state.asideWidth = state.asideWidth === "250px" ? "64px" : "250px";
+    },
+    // 设置menus菜单
+    SET_MENUS(state, menus) {
+      state.menus = menus;
+    },
+    // 设置用户权限
+    SET_RULENAMES(state, ruleNames) {
+      state.ruleNames = ruleNames;
     },
   },
   actions: {
@@ -35,6 +50,8 @@ const store = createStore({
         getInfo()
           .then((res) => {
             commit("SET_USERINFO", res); // 异步提交mutations
+            commit("SET_MENUS", res.menus);
+            commit("SET_RULENAMES", res.ruleNames);
             resolve(res);
           })
           .catch((err) => reject(err));

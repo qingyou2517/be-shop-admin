@@ -34,7 +34,10 @@ const toggleScreen = () => toggle();
       shop-admin
     </span>
 
-    <el-icon class="icon-btn"><Fold /></el-icon>
+    <el-icon class="icon-btn" @click="$store.commit('SET_ASIDE_WIDTH')">
+      <Fold v-if="$store.state.asideWidth === '250px'" />
+      <Expand v-else />
+    </el-icon>
 
     <el-tooltip
       class="box-item"
