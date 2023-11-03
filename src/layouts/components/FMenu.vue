@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed } from "vue";
-import router from "~/router";
+import { router } from "~/router";
 import store from "~/store";
 import { useRoute } from "vue-router";
 

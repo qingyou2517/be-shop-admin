@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onBeforeUnmount } from "vue";
 import { User, Lock } from "@element-plus/icons-vue";
 import { toast } from "~/composables/util";
 import store from "~/store";
-import router from "../router";
+import { router } from "../router";
 
 const form = reactive({
   username: "",

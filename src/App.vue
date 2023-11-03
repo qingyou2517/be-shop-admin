@@ -1,6 +1,4 @@
-<script setup>
-import router from "./router";
-</script>
+<script setup></script>
 
 <template>
   <router-view></router-view>

@@ -1,6 +1,6 @@
 import { ref, reactive } from "vue";
 import store from "~/store";
-import router from "~/router";
+import { router } from "~/router";
 import { updatePassword } from "~/api/manager";
 import { toast, showModal } from "~/composables/util";
 
