@@ -18,12 +18,8 @@ import FTagList from "~/layouts/components/FTagList.vue";
         <FMenu></FMenu>
       </el-aside>
       <el-main>
-        <el-header>
-          <FTagList></FTagList>
-        </el-header>
-        <el-main>
-          <router-view></router-view>
-        </el-main>
+        <FTagList></FTagList>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
