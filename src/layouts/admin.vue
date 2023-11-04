@@ -19,10 +19,48 @@ import FTagList from "~/layouts/components/FTagList.vue";
       </el-aside>
       <el-main>
         <FTagList></FTagList>
-        <router-view></router-view>
+
+        <router-view v-slot="{ Component }">
+          <Transition name="fade">
+            <KeepAlive :max="10">
+              <component :is="Component"></component>
+            </KeepAlive>
+          </Transition>
+        </router-view>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* 进入之前 */
+.fade-enter-from {
+  @apply opacity-0;
+}
+
+/* 进入之后 */
+.fade-enter-to {
+  @apply opacity-100;
+}
+
+/* 离开之前 */
+.fade-leave-from {
+  @apply opacity-100;
+}
+
+/* 离开之后 */
+.fade-leave-to {
+  @apply opacity-0;
+}
+
+/* 动画时长 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s;
+}
+
+/* 延迟进入动画 */
+.fade-enter-active {
+  transition-delay: 0.3s;
+}
+</style>
