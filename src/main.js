@@ -20,4 +20,7 @@ app.use(router);
 import "virtual:windi.css";
 import "nprogress/nprogress.css";
 
+import permission from "~/directives/permission";
+app.use(permission);
+
 app.mount("#app");

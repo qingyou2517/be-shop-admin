@@ -59,8 +59,10 @@ let myChart = null;
 onMounted(() => {
   const chartDom = document.getElementById("chart-wrapper");
   // 在 #chart-wrapper 盒子里初始化 echarts
-  myChart = echarts.init(chartDom);
-  getEChartData();
+  if (chartDom) {
+    myChart = echarts.init(chartDom);
+    getEChartData();
+  }
 });
 
 // 页面销毁前，销毁 myChart
@@ -77,7 +79,9 @@ const handleChoose = (type) => {
 
 // 浏览器大小变化时
 const el = ref(null);
-useResizeObserver(el, (entries) => myChart.resize());
+useResizeObserver(el, (entries) => {
+  if (myChart) myChart.resize();
+});
 </script>
 
 <template>
