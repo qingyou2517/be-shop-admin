@@ -6,6 +6,13 @@ import NotFound from "~/pages/404.vue";
 import Login from "~/pages/login.vue";
 import GoodList from "~/pages/goods/list.vue";
 import CategoryList from "~/pages/category/list.vue";
+import UserList from "~/pages/user/list.vue";
+import OrderList from "~/pages/order/list.vue";
+import CommentList from "~/pages/comment/list.vue";
+import ImageList from "~/pages/image/list.vue";
+import NoticeList from "~/pages/notice/list.vue";
+import SettingBase from "~/pages/setting/base.vue";
+import CouponList from "~/pages/coupon/list.vue";
 
 // 默认路由，所有用户共享
 const routes = [
@@ -57,6 +64,62 @@ const dynamicRoutes = [
     component: CategoryList,
     meta: {
       title: "分类列表",
+    },
+  },
+  {
+    path: "/user/list",
+    name: "/user/list",
+    component: UserList,
+    meta: {
+      title: "用户管理",
+    },
+  },
+  {
+    path: "/order/list",
+    name: "/order/list",
+    component: OrderList,
+    meta: {
+      title: "订单管理",
+    },
+  },
+  {
+    path: "/comment/list",
+    name: "/comment/list",
+    component: CommentList,
+    meta: {
+      title: "评论管理",
+    },
+  },
+  {
+    path: "/image/list",
+    name: "/image/list",
+    component: ImageList,
+    meta: {
+      title: "图库管理",
+    },
+  },
+  {
+    path: "/notice/list",
+    name: "/notice/list",
+    component: NoticeList,
+    meta: {
+      title: "公告管理",
+    },
+  },
+  {
+    path: "/setting/base",
+    name: "/setting/base",
+    component: SettingBase,
+    meta: {
+      title: "基础设置",
+    },
+  },
+  {
+    path: "/coupon/list",
+    name: "/coupon/list",
+    component: CouponList,
+    meta: {
+      title: "优惠券管理",
     },
   },
 ];

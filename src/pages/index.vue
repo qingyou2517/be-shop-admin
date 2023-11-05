@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive } from "vue";
 import CountTo from "~/components/CountTo.vue";
+import IndexNavs from "~/components/IndexNavs.vue";
 import { getStatistics1 } from "~/api/index";
 
 const panels = ref([]);
@@ -67,6 +68,8 @@ getStatistics1().then((res) => {
         </el-card>
       </el-col>
     </el-row>
+
+    <IndexNavs />
   </div>
 </template>
 

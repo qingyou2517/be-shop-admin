@@ -67,7 +67,6 @@ export function useTabList() {
   initTabList();
 
   const handleClose = (command) => {
-    console.log(command);
     if (command === "closeAll") {
       // 只剩下首页
       activeTab.value = "/";
