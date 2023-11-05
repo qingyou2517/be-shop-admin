@@ -3,12 +3,22 @@ import { ref, reactive } from "vue";
 import CountTo from "~/components/CountTo.vue";
 import IndexNavs from "~/components/IndexNavs.vue";
 import IndexEChart from "~/components/IndexEChart.vue";
+import IndexCard from "~/components/IndexCard.vue";
 import { getStatistics1 } from "~/api/index";
+import { getStatistics2 } from "~/api/index";
 
+// 统计面板信息
 const panels = ref([]);
 getStatistics1().then((res) => {
-  // console.log("res: ", res);
   panels.value = res.panels;
+});
+
+//店铺提示信息、交易提示信息
+const goods = ref([]);
+const order = ref([]);
+getStatistics2().then((res) => {
+  goods.value = res.goods;
+  order.value = res.order;
 });
 </script>
 
@@ -75,6 +85,19 @@ getStatistics1().then((res) => {
     <el-row :gutter="20" class="mt-5">
       <el-col :span="12" :offset="0">
         <IndexEChart />
+      </el-col>
+      <el-col :span="12" :offset="0" class="flex items-center">
+        <IndexCard
+          title="店铺及商品提示"
+          tip="店铺及商品提示"
+          :btns="goods"
+          class="mb-3"
+        />
+        <IndexCard
+          title="交易提示"
+          tip="需要立即处理的交易订单"
+          :btns="order"
+        />
       </el-col>
     </el-row>
   </div>

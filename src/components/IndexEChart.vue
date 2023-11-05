@@ -86,10 +86,11 @@ useResizeObserver(el, (entries) => myChart.resize());
       <template #header>
         <div class="flex items-center">
           <span class="text-sm">订单统计</span>
-          <div :key="index" class="ml-auto">
+          <div class="ml-auto">
             <el-check-tag
               class="mr-2"
               v-for="(item, index) in options"
+              :key="index"
               :checked="currentShow === item.value"
               @click="handleChoose(item.value)"
             >
