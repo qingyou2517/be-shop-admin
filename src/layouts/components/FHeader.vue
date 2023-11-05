@@ -27,7 +27,7 @@ const toggleScreen = () => toggle();
 
 <template>
   <div
-    class="flex items-center justify-start bg-indigo-700 text-light-50 h-16 fixed top-0 left-0 right-0"
+    class="flex items-center justify-start bg-indigo-700 text-light-50 h-16 fixed top-0 left-0 right-0 z-1000"
   >
     <span class="w-[250px] flex items-center justify-center text-xl font-thin">
       <el-icon class="mr-1"><Shop /></el-icon>

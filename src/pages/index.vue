@@ -2,6 +2,7 @@
 import { ref, reactive } from "vue";
 import CountTo from "~/components/CountTo.vue";
 import IndexNavs from "~/components/IndexNavs.vue";
+import IndexEChart from "~/components/IndexEChart.vue";
 import { getStatistics1 } from "~/api/index";
 
 const panels = ref([]);
@@ -70,6 +71,12 @@ getStatistics1().then((res) => {
     </el-row>
 
     <IndexNavs />
+
+    <el-row :gutter="20" class="mt-5">
+      <el-col :span="12" :offset="0">
+        <IndexEChart />
+      </el-col>
+    </el-row>
   </div>
 </template>
 

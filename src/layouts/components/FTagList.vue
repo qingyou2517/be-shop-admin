@@ -7,7 +7,7 @@ const { activeTab, tabList, changeTab, removeTab, handleClose } = useTabList();
 <template>
   <div
     :style="{ left: $store.state.asideWidth }"
-    class="fixed top-16 right-0 h-11 bg-gray-100 px-2 flex items-center"
+    class="fixed top-16 right-0 h-11 bg-gray-100 px-2 flex items-center z-1000"
   >
     <el-tabs
       v-model="activeTab"
