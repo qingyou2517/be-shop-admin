@@ -65,7 +65,7 @@ onMounted(() => {
   }
 });
 
-// 页面销毁前，销毁 myChart
+// 页面销毁前，销毁 myChart；那么同时要在 init 时判断图表容器节点是否存在
 onBeforeUnmount(() => {
   if (myChart) echarts.dispose(myChart);
 });
