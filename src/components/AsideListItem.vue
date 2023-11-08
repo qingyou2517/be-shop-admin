@@ -28,15 +28,18 @@ defineEmits(["edit", "delete"]);
     >
       <el-icon><Edit /></el-icon>
     </el-button>
-    <el-button
-      text
-      type="primary"
-      size="small"
-      class="px-1"
-      @click="$emit('delete')"
+    <el-popconfirm
+      title="是否删除该相册?"
+      confirmButtonText="确认"
+      cancelButtonText="取消"
+      @confirm="$emit('delete')"
     >
-      <el-icon><Close /></el-icon>
-    </el-button>
+      <template #reference>
+        <el-button text type="primary" size="small" class="px-1">
+          <el-icon><Close /></el-icon>
+        </el-button>
+      </template>
+    </el-popconfirm>
   </div>
 </template>
 
