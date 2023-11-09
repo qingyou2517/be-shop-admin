@@ -30,3 +30,12 @@ export function showFullLoading() {
 export function hideFullLoading() {
   nProgress.done(); // 开启loading功能
 }
+
+// 弹出输入框
+export function showPrompt(title, value = "") {
+  return ElMessageBox.prompt(title, "", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    inputValue: value,
+  });
+}

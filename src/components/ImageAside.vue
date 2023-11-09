@@ -14,7 +14,7 @@ import { toast } from "~/composables/util.js";
 const loading = ref(false);
 // 图片分类名列表
 const classNameList = ref([]);
-// 激活的分类项
+// 选中的图库分类id
 const activeId = ref(0);
 
 // 分页
@@ -30,8 +30,10 @@ const drawerTitle = computed(() => {
 const editId = ref(0);
 
 // 改变activeId
+const emit = defineEmits(["change"]);
 function changeActive(id) {
   activeId.value = id;
+  emit("change", id);
 }
 
 // 获取数据
@@ -47,7 +49,7 @@ async function getData(p = null) {
     classNameList.value = list;
     total.value = totalCount;
     let item = classNameList.value[0]; // 默认选中第一项图片分类名
-    if (item) activeId.value = item.id;
+    if (item) changeActive(item.id); // 把第一项分类的id通知给父组件
   } finally {
     loading.value = false;
   }

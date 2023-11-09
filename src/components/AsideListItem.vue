@@ -45,6 +45,6 @@ defineEmits(["edit", "delete"]);
 
 <style scoped>
 .active {
-  @apply bg-blue-300;
+  @apply bg-blue-50;
 }
 </style>
