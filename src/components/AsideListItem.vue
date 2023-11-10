@@ -24,22 +24,24 @@ defineEmits(["edit", "delete"]);
       type="primary"
       size="small"
       class="ml-auto px-1"
-      @click="$emit('edit')"
+      @click.stop="$emit('edit')"
     >
       <el-icon><Edit /></el-icon>
     </el-button>
-    <el-popconfirm
-      title="是否删除该相册?"
-      confirmButtonText="确认"
-      cancelButtonText="取消"
-      @confirm="$emit('delete')"
-    >
-      <template #reference>
-        <el-button text type="primary" size="small" class="px-1">
-          <el-icon><Close /></el-icon>
-        </el-button>
-      </template>
-    </el-popconfirm>
+    <span @click.stop="() => {}">
+      <el-popconfirm
+        title="是否删除该相册?"
+        confirmButtonText="确认"
+        cancelButtonText="取消"
+        @confirm="$emit('delete')"
+      >
+        <template #reference>
+          <el-button text type="primary" size="small" class="px-1">
+            <el-icon><Close /></el-icon>
+          </el-button>
+        </template>
+      </el-popconfirm>
+    </span>
   </div>
 </template>
 
