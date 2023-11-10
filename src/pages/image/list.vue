@@ -17,6 +17,11 @@ const imageMainRef = ref(null);
 function handleChangeAside(image_class_id) {
   imageMainRef.value.loadData(image_class_id);
 }
+
+// 打开上传图片的抽屉组件：调用ImageMain.vue暴露的方法
+const openUpload = () => {
+  imageMainRef.value.openUploadFile();
+};
 </script>
 
 <template>
@@ -29,7 +34,11 @@ function handleChangeAside(image_class_id) {
         @click="openAdd"
         >新增图片分类</el-button
       >
-      <el-button text size="small" class="bg-yellow-400 text-light-100"
+      <el-button
+        type="warning"
+        size="small"
+        class="bg-yellow-400 text-light-100"
+        @click="openUpload"
         >上传图片</el-button
       >
     </el-header>

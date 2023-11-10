@@ -3,6 +3,11 @@ import { ref, reactive } from "vue";
 import { getImageList, updateImageName, deleteImage } from "~/api/image.js";
 import { showPrompt } from "~/composables/util.js";
 import { toast } from "../composables/util";
+import UploadFile from "~/components/UploadFile.vue";
+
+// 上传图片
+const drawer = ref(false);
+const openUploadFile = () => (drawer.value = true);
 
 // 分页
 const currentPage = ref(1);
@@ -44,6 +49,7 @@ function loadData(id) {
 }
 defineExpose({
   loadData,
+  openUploadFile,
 });
 
 // 重命名
@@ -73,6 +79,9 @@ async function handleDelete(item) {
     loading.value = false;
   }
 }
+
+// 图片上传成功，刷新当前页
+const handleUploadSuccess = (response, uploadFile, uploadFiles) => getData(1);
 </script>
 
 <template>
@@ -141,6 +150,10 @@ async function handleDelete(item) {
       />
     </div>
   </el-main>
+
+  <el-drawer v-model="drawer" title="上传图片">
+    <UploadFile :data="{ image_class_id }" @success="handleUploadSuccess" />
+  </el-drawer>
 </template>
 
 <style scoped></style>
