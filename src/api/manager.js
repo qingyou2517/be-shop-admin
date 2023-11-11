@@ -26,3 +26,14 @@ export function updatePassword({ oldpassword, password, repassword }) {
     repassword,
   });
 }
+
+// 获取管理员列表
+export function getManagerList(
+  page,
+  query = {
+    limit: 10,
+    keyword: "ceshi",
+  }
+) {
+  return axios.get(`/admin/manager/${page}`, { params: query });
+}

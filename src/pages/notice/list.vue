@@ -134,9 +134,9 @@ const handleDelete = async (id) => {
     </div>
 
     <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
-      <el-table-column prop="title" label="公告标题" />
-      <el-table-column prop="create_time" label="发布时间" width="380" />
-      <el-table-column label="操作" align="center">
+      <el-table-column prop="title" label="公告标题" class="truncate" />
+      <el-table-column prop="create_time" label="发布时间" width="250" />
+      <el-table-column label="操作" align="center" width="180">
         <template #default="scope">
           <el-button
             type="primary"
