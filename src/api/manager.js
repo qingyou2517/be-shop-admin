@@ -37,3 +37,24 @@ export function getManagerList(
 ) {
   return axios.get(`/admin/manager/${page}`, { params: query });
 }
+
+// 修改管理员状态
+export function updateManagerStatus(id, status) {
+  // 注意第二个参数需要是对象
+  return axios.post(`/admin/manager/${id}/update_status`, { status });
+}
+
+// 新增管理员
+export function addManager(data) {
+  return axios.post(`/admin/manager`, data);
+}
+
+// 修改管理员
+export function updateManager(id, data) {
+  return axios.post(`/admin/manager/${id}`, data);
+}
+
+// 删除管理员
+export function deleteManager(id) {
+  return axios.post(`/admin/manager/${id}/delete`);
+}
