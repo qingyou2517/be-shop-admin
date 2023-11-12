@@ -89,7 +89,7 @@ function handleSubmit() {
 
 // 新增公告
 const handleAdd = () => {
-  formRef.value.clearValidate(); // 去除表单的校验报错信息
+  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
   form.title = "";
   form.content = "";
   drawerTitle.value = "新增";
@@ -98,7 +98,7 @@ const handleAdd = () => {
 
 // 编辑公告
 const handleEdit = (item) => {
-  formRef.value.clearValidate(); // 去除表单的校验报错信息
+  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
   form.title = item.title;
   form.content = item.content;
   updateId.value = item.id;

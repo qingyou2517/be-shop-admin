@@ -59,6 +59,7 @@ getData();
 // 调用FormDrawer组件提供的方法
 const formDrawerRef = ref(null);
 const handleCreate = () => {
+  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
   formDrawerRef.value.open();
   functionType.value = "create";
   formData.name = "";
@@ -112,6 +113,7 @@ function handleSubmit() {
 
 // 编辑分类名
 function handleEdit(item) {
+  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
   formData.name = item.name;
   formData.order = item.order;
   editId.value = item.id;
