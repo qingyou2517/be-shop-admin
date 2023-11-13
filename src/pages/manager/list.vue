@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import {
   getManagerList,
   updateManagerStatus,
@@ -7,162 +7,95 @@ import {
   updateManager,
   deleteManager,
 } from "~/api/manager";
-import { toast } from "~/composables/util.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ChooseImage from "~/components/ChooseImage.vue";
+import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-const tableList = ref([]);
-const loading = ref(false);
+// 所属角色，只在管理员模块使用，所以不抽离到公共模块
 const rolesList = ref([]);
 
-// 搜索
-const searchForm = reactive({
-  keyword: "",
-});
-const resetSearchForm = () => {
-  searchForm.keyword = "";
-  getData();
-};
-
-// 抽屉组件
-const formDrawerRef = ref(null);
-const drawerTitle = ref("");
-
-// 分页
-const currentPage = ref(1);
-const total = ref(0);
-const limit = ref(10);
-
-// 获取数据
-async function getData(p = null) {
-  // 假如切换分页，getData 会拿到 current-change 事件传递过来的页码(即 p )
-  if (typeof p === "number") {
-    currentPage.value = p;
-  }
-
-  loading.value = true;
-  try {
-    let { list, totalCount, roles } = await getManagerList(
-      currentPage.value,
-      searchForm
-    );
-    tableList.value = list.map((item) => {
+// 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项
+const option = {
+  searchForm: {
+    keyword: "",
+  },
+  getList: getManagerList,
+  getListSuccess: (res) => {
+    tableList.value = res.list.map((item) => {
       item.switchLoading = false;
       return item;
     });
-    total.value = totalCount;
-    rolesList.value = roles;
-  } finally {
-    loading.value = false;
-  }
-}
+    total.value = res.totalCount;
+    rolesList.value = res.roles;
+  },
+  updateStatus: updateManagerStatus,
+  delete: deleteManager,
+};
+
+const {
+  tableList,
+  loading,
+  searchForm,
+  resetSearchForm,
+  currentPage,
+  total,
+  limit,
+  getData,
+  handleStatusChange,
+  handleDelete,
+} = useInitTable(option);
+
+// 获取数据
 getData();
 
-// 修改管理员状态
-const handleStatusChange = async (e, row) => {
-  row.switchLoading = true;
-  try {
-    updateManagerStatus(row.id, e);
-    toast("修改状态成功");
-    row.status = e;
-  } finally {
-    row.switchLoading = false;
-  }
+// 新增、修改管理员
+const formOption = {
+  defaultForm: {
+    username: "",
+    password: "",
+    role_id: null,
+    status: 1,
+    avatar: "",
+  },
+  rules: {
+    username: [
+      {
+        required: true,
+        message: "用户名不能为空",
+        trigger: "blur", // 触发校验的时机是：失去焦点时
+      },
+    ],
+    password: [
+      {
+        required: true,
+        message: "密码不能为空",
+        trigger: "blur", // 触发校验的时机是：失去焦点时
+      },
+    ],
+    role_id: [
+      {
+        required: true,
+        message: "请选择所属角色",
+        trigger: "blur", // 触发校验的时机是：失去焦点时
+      },
+    ],
+  },
+  currentPage,
+  getData,
+  update: updateManager,
+  add: addManager,
 };
 
-// 表单数据
-const updateId = ref(0);
-const formRef = ref(null);
-const form = reactive({
-  username: "",
-  password: "",
-  role_id: null,
-  status: 1,
-  avatar: "",
-});
-const rules = {
-  username: [
-    {
-      required: true,
-      message: "用户名不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-  password: [
-    {
-      required: true,
-      message: "密码不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-  role_id: [
-    {
-      required: true,
-      message: "请选择所属角色",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-};
-// 表单提交
-const handleSubmit = () => {
-  formRef.value.validate(async (valid) => {
-    if (!valid) return;
-
-    formDrawerRef.value.showLoading();
-    try {
-      if (updateId.value !== 0) {
-        await updateManager(updateId.value, form);
-        toast("修改成功");
-        getData(currentPage.value);
-      } else {
-        await addManager(form);
-        toast("新增成功");
-        getData(1);
-      }
-
-      formDrawerRef.value.close();
-    } finally {
-      formDrawerRef.value.hideLoading();
-    }
-  });
-};
-
-// 新增管理员
-const handleAdd = () => {
-  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
-  form.username = "";
-  form.password = "";
-  form.avatar = "";
-  form.role_id = null;
-  form.status = 1;
-  drawerTitle.value = "新增";
-  formDrawerRef.value.open();
-};
-
-// 修改管理员信息
-const handleEdit = (item) => {
-  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
-  form.username = item.username;
-  form.password = "";
-  form.avatar = item.avatar;
-  form.role_id = item.role_id;
-  form.status = item.status;
-  updateId.value = item.id;
-  drawerTitle.value = "修改";
-  formDrawerRef.value.open();
-};
-
-// 删除该管理员
-const handleDelete = async (id) => {
-  loading.value = true;
-  try {
-    await deleteManager(id);
-    toast("删除成功");
-    getData(currentPage.value);
-  } finally {
-    loading.value = false;
-  }
-};
+const {
+  formDrawerRef,
+  drawerTitle,
+  formRef,
+  form,
+  rules,
+  handleSubmit,
+  handleAdd,
+  handleEdit,
+} = useInitForm(formOption);
 </script>
 
 <template>

@@ -8,103 +8,62 @@ import {
 } from "~/api/notice.js";
 import { toast } from "~/composables/util";
 import FormDrawer from "~/components/FormDrawer.vue";
+import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-const tableList = ref([]);
-const loading = ref(false);
+// 组件特有的 get 方法，但 get 成功采用默认的数据操作
+const option = {
+  getList: getNoticeList,
+  delete: deleteNotice,
+};
 
-// 分页
-const currentPage = ref(1);
-const total = ref(0);
-const limit = ref(10);
+const { tableList, loading, currentPage, total, limit, getData } =
+  useInitTable(option);
 
 // 获取数据
-async function getData(p = null) {
-  // 假如切换分页，getData 会拿到 current-change 事件传递过来的页码(即 p )
-  if (typeof p === "number") {
-    currentPage.value = p;
-  }
-
-  loading.value = true;
-  try {
-    let { list, totalCount } = await getNoticeList(currentPage.value);
-    tableList.value = list;
-    total.value = totalCount;
-  } finally {
-    loading.value = false;
-  }
-}
 getData();
 
-// 抽屉组件的数据
-const drawerTitle = ref("");
-const formDrawerRef = ref(null);
+// 新增、修改公告
+const formOption = {
+  defaultForm: {
+    title: "",
+    content: "",
+  },
+  rules: {
+    title: [
+      {
+        required: true,
+        message: "公告标题不能为空",
+        trigger: "blur", // 触发校验的时机是：失去焦点时
+      },
+    ],
+    content: [
+      {
+        required: true,
+        message: "公告内容不能为空",
+        trigger: "blur", // 触发校验的时机是：失去焦点时
+      },
+    ],
+  },
+  currentPage,
+  getData,
+  update: updateNotice,
+  add: addNotice,
+};
+
+const {
+  formDrawerRef,
+  drawerTitle,
+  handleStatusChange,
+  formRef,
+  form,
+  rules,
+  handleSubmit,
+  handleAdd,
+  handleEdit,
+} = useInitForm(formOption);
 
 // 表单数据
 const updateId = ref(0);
-const formRef = ref(null);
-const form = reactive({
-  title: "",
-  content: "",
-});
-const rules = {
-  title: [
-    {
-      required: true,
-      message: "公告标题不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-  content: [
-    {
-      required: true,
-      message: "公告内容不能为空",
-      trigger: "blur", // 触发校验的时机是：失去焦点时
-    },
-  ],
-};
-
-// 表单校验
-function handleSubmit() {
-  formRef.value.validate(async (valid) => {
-    if (!valid) return;
-
-    formDrawerRef.value.showLoading();
-    try {
-      if (updateId.value !== 0) {
-        await updateNotice(updateId.value, form);
-        toast("修改成功");
-        getData(currentPage.value);
-      } else {
-        await addNotice(form);
-        toast("新增成功");
-        getData(1);
-      }
-
-      formDrawerRef.value.close();
-    } finally {
-      formDrawerRef.value.hideLoading();
-    }
-  });
-}
-
-// 新增公告
-const handleAdd = () => {
-  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
-  form.title = "";
-  form.content = "";
-  drawerTitle.value = "新增";
-  formDrawerRef.value.open();
-};
-
-// 编辑公告
-const handleEdit = (item) => {
-  if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
-  form.title = item.title;
-  form.content = item.content;
-  updateId.value = item.id;
-  drawerTitle.value = "修改";
-  formDrawerRef.value.open();
-};
 
 // 删除公告
 const handleDelete = async (id) => {
