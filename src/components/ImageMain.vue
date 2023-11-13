@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, computed } from "vue";
 import { getImageList, updateImageName, deleteImage } from "~/api/image.js";
 import { showPrompt } from "~/composables/util.js";
 import { toast } from "../composables/util";
@@ -34,7 +34,10 @@ async function getData(p = null) {
       image_class_id.value,
       currentPage.value
     );
-    imageList.value = list;
+    imageList.value = list.map((item) => {
+      item.checked = false;
+      return item;
+    });
     total.value = totalCount;
   } finally {
     loading.value = false;
@@ -51,6 +54,28 @@ defineExpose({
   loadData,
   openUploadFile,
 });
+
+// 是否显示选择图片按钮
+defineProps({
+  showChoose: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+// 选择图片
+const checkedImage = computed(() => {
+  return imageList.value.filter((item) => item.checked);
+});
+const emit = defineEmits(["choose"]);
+function handleChooseChange(item) {
+  if (item.checked && checkedImage.value.length > 1) {
+    toast("一次最多只能选择一张图片", "error");
+    item.checked = false;
+    return;
+  }
+  emit("choose", checkedImage.value);
+}
 
 // 重命名
 async function handleRename(item) {
@@ -89,7 +114,6 @@ const handleUploadSuccess = (response, uploadFile, uploadFiles) => getData(1);
     <div
       class="absolute top-0 right-0 left-0 bottom-[50px] overflow-y-auto p-3"
     >
-      <!-- <div v-for="i in 100" :key="i">{{ i }}</div> -->
       <el-row :gutter="10">
         <el-col
           :span="6"
@@ -100,6 +124,7 @@ const handleUploadSuccess = (response, uploadFile, uploadFiles) => getData(1);
           <el-card
             shadow="hover"
             class="relative mb-3"
+            :class="{ 'border-blue-400': item.checked }"
             :body-style="{ padding: 0 }"
           >
             <el-image
@@ -115,6 +140,12 @@ const handleUploadSuccess = (response, uploadFile, uploadFiles) => getData(1);
               {{ item.name }}
             </div>
             <div class="flex items-center justify-center p-2">
+              <el-checkbox
+                v-model="item.checked"
+                @change="handleChooseChange(item)"
+                v-if="showChoose"
+              ></el-checkbox>
+
               <el-button
                 type="primary"
                 size="small"
@@ -129,7 +160,9 @@ const handleUploadSuccess = (response, uploadFile, uploadFiles) => getData(1);
                 @confirm="handleDelete(item)"
               >
                 <template #reference>
-                  <el-button type="primary" size="small" text>删除</el-button>
+                  <el-button type="primary" size="small" text class="!m-0"
+                    >删除</el-button
+                  >
                 </template>
               </el-popconfirm>
             </div>

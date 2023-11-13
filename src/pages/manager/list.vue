@@ -9,6 +9,7 @@ import {
 } from "~/api/manager";
 import { toast } from "~/composables/util.js";
 import FormDrawer from "~/components/FormDrawer.vue";
+import ChooseImage from "~/components/ChooseImage.vue";
 
 const tableList = ref([]);
 const loading = ref(false);
@@ -291,7 +292,7 @@ const handleDelete = async (id) => {
           <el-input v-model="form.password"></el-input>
         </el-form-item>
         <el-form-item label="头像">
-          <el-input v-model="form.avatar"></el-input>
+          <ChooseImage v-model="form.avatar"></ChooseImage>
         </el-form-item>
         <el-form-item label="所属角色" prop="role_id">
           <el-select v-model="form.role_id" placeholder="选择所属角色">

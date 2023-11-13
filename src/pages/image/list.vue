@@ -6,7 +6,7 @@ import ImageMain from "~/components/ImageMain.vue";
 const windowHeight = window.innerHeight || document.body.clientHeight;
 const h = windowHeight - 64 - 44 - 40;
 
-// 打开抽屉组件：调用ImageAside.vue暴露的方法
+// 新增图片分类 => 打开抽屉组件：调用ImageAside.vue暴露的方法
 const imageAsideRef = ref(null);
 const openAdd = () => {
   imageAsideRef.value.handleCreate();
@@ -18,7 +18,7 @@ function handleChangeAside(image_class_id) {
   imageMainRef.value.loadData(image_class_id);
 }
 
-// 打开上传图片的抽屉组件：调用ImageMain.vue暴露的方法
+// 上传图片 => 打开抽屉组件：调用ImageMain.vue暴露的方法
 const openUpload = () => {
   imageMainRef.value.openUploadFile();
 };
