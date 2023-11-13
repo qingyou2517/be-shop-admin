@@ -8,6 +8,7 @@ import {
 } from "~/api/notice.js";
 import { toast } from "~/composables/util";
 import FormDrawer from "~/components/FormDrawer.vue";
+import ListHeader from "~/components/ListHeader.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 组件特有的 get 方法，但 get 成功采用默认的数据操作
@@ -80,19 +81,7 @@ const handleDelete = async (id) => {
 
 <template>
   <el-card shadow="never" class="border-0">
-    <div class="flex items-center justify-between mb-4">
-      <el-button type="primary" size="small" @click="handleAdd">新增</el-button>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="刷新数据"
-        placement="top"
-      >
-        <el-button text @click="getData">
-          <el-icon :size="20"><Refresh /> </el-icon>
-        </el-button>
-      </el-tooltip>
-    </div>
+    <ListHeader @create="handleAdd" @refresh="getData"></ListHeader>
 
     <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
       <el-table-column prop="title" label="公告标题" class="truncate" />

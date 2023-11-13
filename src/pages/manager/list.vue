@@ -9,6 +9,7 @@ import {
 } from "~/api/manager";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ChooseImage from "~/components/ChooseImage.vue";
+import ListHeader from "~/components/ListHeader.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 所属角色，只在管理员模块使用，所以不抽离到公共模块
@@ -121,19 +122,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <div class="flex items-center justify-between mb-4">
-      <el-button type="primary" size="small" @click="handleAdd">新增</el-button>
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="刷新数据"
-        placement="top"
-      >
-        <el-button text @click="getData">
-          <el-icon :size="20"><Refresh /> </el-icon>
-        </el-button>
-      </el-tooltip>
-    </div>
+    <ListHeader @create="handleAdd" @refresh="getData"></ListHeader>
 
     <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
       <el-table-column label="管理员" width="200">
