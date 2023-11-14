@@ -48,6 +48,8 @@ export function useInitTable(option = {}) {
       loading.value = false;
     }
   }
+  // 别忘了执行
+  getData();
 
   // 修改状态
   const handleStatusChange = async (e, row) => {
