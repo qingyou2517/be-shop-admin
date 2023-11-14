@@ -2,10 +2,10 @@
 import { ref, reactive, computed } from "vue";
 import { router } from "~/router";
 import store from "~/store";
-import { useRoute } from "vue-router";
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
 
 const route = useRoute();
-// 当前路由url
+// 默认路由：当前路由url
 const defaultActive = ref(route.path);
 
 const asideMenus = computed(() => store.state.menus);
@@ -18,6 +18,11 @@ const isFold = computed(() => {
 const handleSelect = (index) => {
   router.push(index);
 };
+
+// 监听路由变化
+onBeforeRouteUpdate((to, from) => {
+  defaultActive.value = to.path;
+});
 </script>
 
 <template>
