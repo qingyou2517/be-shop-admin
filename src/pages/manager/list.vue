@@ -46,9 +46,6 @@ const {
   handleDelete,
 } = useInitTable(option);
 
-// 获取数据
-getData();
-
 // 新增、修改管理员
 const formOption = {
   defaultForm: {
