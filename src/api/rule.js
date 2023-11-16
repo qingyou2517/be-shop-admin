@@ -12,3 +12,11 @@ export function updateRule(id, data) {
 export function addRule(data) {
   return axios.post("/admin/rule", data);
 }
+
+export function updateRuleStatus(id, status) {
+  return axios.post(`/admin/rule/${id}/update_status`, { status });
+}
+
+export function deleteRule(id) {
+  return axios.post(`/admin/rule/${id}/delete`);
+}

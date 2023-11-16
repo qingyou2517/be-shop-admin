@@ -3,7 +3,13 @@ import { ref, reactive } from "vue";
 import ListHeader from "~/components/ListHeader.vue";
 import FormDrawer from "~/components/FormDrawer.vue";
 import IconSelect from "~/components/IconSelect.vue";
-import { getRulesList, updateRule, addRule } from "~/api/rule.js";
+import {
+  getRulesList,
+  updateRule,
+  addRule,
+  updateRuleStatus,
+  deleteRule,
+} from "~/api/rule.js";
 import { useInitTable, useInitForm } from "~/composables/useCommon.js";
 
 // 树形列表
@@ -20,6 +26,8 @@ const option = {
     tableList.value = res.list;
     defaultExpandedKeys.value = res.list.map((item) => item.id);
   },
+  updateStatus: updateRuleStatus,
+  delete: deleteRule,
 };
 const { tableList, loading, getData, handleStatusChange, handleDelete } =
   useInitTable(option);
@@ -60,6 +68,13 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
+
+// 添加子分类
+const addChild = (id) => {
+  handleAdd(); // 来自 useInitForm 方法: 打开抽屉组件、reset表单
+  form.rule_id = id;
+  form.status = 1;
+};
 </script>
 
 <template>
@@ -83,11 +98,15 @@ const {
           <span>{{ data.name }}</span>
 
           <div class="ml-auto items-center">
-            <el-switch
-              :modelValue="data.status"
-              :active-value="1"
-              :inactive-value="0"
-            />
+            <span @click.stop="">
+              <el-switch
+                :modelValue="data.status"
+                :active-value="1"
+                :inactive-value="0"
+                @change="handleStatusChange($event, data)"
+              />
+            </span>
+
             <el-button
               text
               type="primary"
@@ -99,16 +118,21 @@ const {
               text
               type="primary"
               size="small"
-              @click.stop="handleAdd()"
+              @click.stop="addChild(data.id)"
               >增加</el-button
             >
-            <el-button
-              text
-              type="primary"
-              size="small"
-              @click.stop="handleDelete"
-              >删除</el-button
-            >
+            <span @click.stop="">
+              <el-popconfirm
+                title="是否删除?"
+                confirmButtonText="确认"
+                cancelButtonText="取消"
+                @confirm="handleDelete(data.id)"
+              >
+                <template #reference>
+                  <el-button text type="primary" size="small">删除</el-button>
+                </template>
+              </el-popconfirm>
+            </span>
           </div>
         </div>
       </template>

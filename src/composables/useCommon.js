@@ -52,12 +52,14 @@ export function useInitTable(option = {}) {
   getData();
 
   // 修改状态
-  const handleStatusChange = async (e, row) => {
+  const handleStatusChange = async (status, row) => {
     row.switchLoading = true;
     try {
-      await option.updateStatus(row.id, e);
+      await option.updateStatus(row.id, status);
       toast("修改状态成功");
-      row.status = e;
+      row.status = status;
+    } catch (err) {
+      console.log("修改状态失败：", err);
     } finally {
       row.switchLoading = false;
     }
@@ -70,6 +72,8 @@ export function useInitTable(option = {}) {
       await option.delete(id);
       toast("删除成功");
       getData(currentPage.value);
+    } catch (err) {
+      console.log("删除失败：", err);
     } finally {
       loading.value = false;
     }
@@ -119,6 +123,10 @@ export function useInitForm(option = {}) {
         }
 
         formDrawerRef.value.close();
+      } catch (err) {
+        updateId.value !== 0
+          ? console.log("修改失败：", err)
+          : console.log("新增失败：", err);
       } finally {
         formDrawerRef.value.hideLoading();
       }
