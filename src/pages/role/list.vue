@@ -77,18 +77,32 @@ const setRuleFormDrawerRef = ref(null);
 const defaultExpandedKeys = ref([]); // 默认展开的节点，由 node-key 组成的一维数组
 const rulesList = ref([]); // 虚拟树的节点列表数据
 const treeHeight = ref(1); // 虚拟树的高度
+const elTreeRef = ref(null); // 虚拟树
+
+// 当前用户拥有的权限id
+const ruleIds = ref([]);
 
 // 打开抽屉组件
-const openSetRuleDrawer = async () => {
+const openSetRuleDrawer = async (row) => {
   treeHeight.value = window.innerHeight - 170;
   try {
     let res = await getRulesList();
     rulesList.value = res.list;
+    console.log(res);
     defaultExpandedKeys.value = res.list.map((item) => item.id); // 设置默认展开的节点
+
+    setRuleFormDrawerRef.value.open();
+    // console.log(row);
+    // 当前角色所拥有的权限
+    ruleIds.value = row.rules.map((item) => item.id);
+
+    // 设置虚拟树的默认勾选节点
+    setTimeout(() => {
+      elTreeRef.value.setCheckedKeys(ruleIds.value); // 注意要在打开抽屉之后调用，注意要异步
+    }, 100);
   } catch (err) {
-    console.log("获取菜单及权限失败: ", err);
+    console.log("渲染菜单及权限失败: ", err);
   }
-  setRuleFormDrawerRef.value.open();
 };
 
 // 提交
@@ -190,6 +204,7 @@ const handleSetRulesSubmit = () => {};
       @submit="handleSetRulesSubmit"
     >
       <el-tree-v2
+        ref="elTreeRef"
         :data="rulesList"
         :props="{ label: 'name', children: 'child' }"
         show-checkbox
