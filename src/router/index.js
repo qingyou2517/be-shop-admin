@@ -15,6 +15,7 @@ import SettingBase from "~/pages/setting/base.vue";
 import CouponList from "~/pages/coupon/list.vue";
 import ManagerList from "~/pages/manager/list.vue";
 import AccessList from "~/pages/access/list.vue";
+import RolesList from "~/pages/role/list.vue";
 
 // 默认路由，所有用户共享
 const routes = [
@@ -106,6 +107,14 @@ const dynamicRoutes = [
     component: AccessList,
     meta: {
       title: "权限管理",
+    },
+  },
+  {
+    path: "/role/list",
+    name: "/role/list",
+    component: RolesList,
+    meta: {
+      title: "角色管理",
     },
   },
   {

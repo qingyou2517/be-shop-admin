@@ -11,17 +11,14 @@ import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-// 组件特有的 get 方法，但 get 成功采用默认的数据操作
+// 组件特有的 get 数据方式、删除操作
 const option = {
   getList: getNoticeList,
   delete: deleteNotice,
 };
 
-const { tableList, loading, currentPage, total, limit, getData } =
+const { tableList, loading, currentPage, total, limit, getData, handleDelete } =
   useInitTable(option);
-
-// 获取数据
-getData();
 
 // 新增、修改公告
 const formOption = {
@@ -54,7 +51,6 @@ const formOption = {
 const {
   formDrawerRef,
   drawerTitle,
-  handleStatusChange,
   formRef,
   form,
   rules,
@@ -65,18 +61,6 @@ const {
 
 // 表单数据
 const updateId = ref(0);
-
-// 删除公告
-const handleDelete = async (id) => {
-  loading.value = true;
-  try {
-    await deleteNotice(id);
-    toast("删除成功");
-    getData(currentPage.value);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -134,7 +118,7 @@ const handleDelete = async (id) => {
           <el-input v-model="form.title"></el-input>
         </el-form-item>
         <el-form-item label="公告内容:" prop="content">
-          <el-input v-model="form.content"></el-input>
+          <el-input v-model="form.content" type="textarea" :rows="4"></el-input>
         </el-form-item>
       </el-form>
     </FormDrawer>
