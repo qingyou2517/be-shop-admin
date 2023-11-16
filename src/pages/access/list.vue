@@ -220,7 +220,7 @@ const addChild = (id) => {
           ></el-input>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.order" :min="0" :max="1000" @change="">
+          <el-input-number v-model="form.order" :min="0" :max="1000">
           </el-input-number>
         </el-form-item>
       </el-form>
