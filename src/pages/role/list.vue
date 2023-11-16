@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, computed } from "vue";
 import {
   getRolesList,
   addRole,
@@ -7,6 +7,7 @@ import {
   updateRoleStatus,
   deleteRole,
 } from "~/api/role.js";
+import { getRulesList } from "~/api/rule.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
@@ -68,6 +69,30 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
+
+// 配置权限：抽屉组件
+const setRuleFormDrawerRef = ref(null);
+
+// 抽屉组件内的虚拟化树形可选列表
+const defaultExpandedKeys = ref([]); // 默认展开的节点，由 node-key 组成的一维数组
+const rulesList = ref([]); // 虚拟树的节点列表数据
+const treeHeight = ref(1); // 虚拟树的高度
+
+// 打开抽屉组件
+const openSetRuleDrawer = async () => {
+  treeHeight.value = window.innerHeight - 170;
+  try {
+    let res = await getRulesList();
+    rulesList.value = res.list;
+    defaultExpandedKeys.value = res.list.map((item) => item.id); // 设置默认展开的节点
+  } catch (err) {
+    console.log("获取菜单及权限失败: ", err);
+  }
+  setRuleFormDrawerRef.value.open();
+};
+
+// 提交
+const handleSetRulesSubmit = () => {};
 </script>
 
 <template>
@@ -76,7 +101,12 @@ const {
 
     <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
       <el-table-column prop="name" label="角色名称" class="truncate" />
-      <el-table-column prop="desc" label="角色描述" width="250" />
+      <el-table-column
+        prop="desc"
+        label="角色描述"
+        width="250"
+        class="truncate"
+      />
       <el-table-column label="状态" width="120">
         <template #default="{ row }">
           <el-switch
@@ -89,8 +119,16 @@ const {
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="180">
+      <el-table-column label="操作" align="center" width="220">
         <template #default="{ row }">
+          <el-button
+            type="primary"
+            text
+            size="small"
+            @click="openSetRuleDrawer(row)"
+          >
+            配置权限
+          </el-button>
           <el-button type="primary" text size="small" @click="handleEdit(row)">
             修改
           </el-button>
@@ -143,6 +181,31 @@ const {
           </el-switch>
         </el-form-item>
       </el-form>
+    </FormDrawer>
+
+    <!-- 配置权限的弹窗：树形多选框 -->
+    <FormDrawer
+      ref="setRuleFormDrawerRef"
+      title="权限配置"
+      @submit="handleSetRulesSubmit"
+    >
+      <el-tree-v2
+        :data="rulesList"
+        :props="{ label: 'name', children: 'child' }"
+        show-checkbox
+        node-key="id"
+        :default-expanded-keys="defaultExpandedKeys"
+        :height="treeHeight"
+      >
+        <template #default="{ node, data }">
+          <div class="flex items-center">
+            <el-tag size="small" :type="data.menu ? '' : 'info'">{{
+              data.menu ? "菜单" : "权限"
+            }}</el-tag>
+            <span class="ml-2 text-sm">{{ data.name }}</span>
+          </div>
+        </template>
+      </el-tree-v2>
     </FormDrawer>
   </el-card>
 </template>
