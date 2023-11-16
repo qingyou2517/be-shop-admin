@@ -2,6 +2,7 @@
 import { ref, reactive } from "vue";
 import ListHeader from "~/components/ListHeader.vue";
 import FormDrawer from "~/components/FormDrawer.vue";
+import IconSelect from "~/components/IconSelect.vue";
 import { getRulesList, updateRule, addRule } from "~/api/rule.js";
 import { useInitTable, useInitForm } from "~/composables/useCommon.js";
 
@@ -173,8 +174,16 @@ const {
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="菜单图标" prop="icon" v-if="form.menu === 1">
-          <el-input v-model="form.icon"></el-input>
+        <el-form-item
+          label="菜单图标"
+          prop="icon"
+          v-if="form.menu === 1"
+          class="flex items-center"
+        >
+          <el-icon v-if="form.icon" class="mr-2">
+            <component :is="form.icon"></component>
+          </el-icon>
+          <IconSelect v-model="form.icon"></IconSelect>
         </el-form-item>
         <el-form-item
           label="前端路由"
