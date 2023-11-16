@@ -22,3 +22,6 @@ export function deleteRole(id) {
 }
 
 // 配置权限
+export function setRoleRules(id, rule_ids) {
+  return axios.post("/admin/role/set_rules", { id, rule_ids });
+}

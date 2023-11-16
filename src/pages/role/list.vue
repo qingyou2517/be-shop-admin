@@ -6,10 +6,12 @@ import {
   updateRole,
   updateRoleStatus,
   deleteRole,
+  setRoleRules,
 } from "~/api/role.js";
 import { getRulesList } from "~/api/rule.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
+import { toast } from "~/composables/util.js";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 列表展示、修改状态、删除列表项
@@ -78,17 +80,21 @@ const defaultExpandedKeys = ref([]); // 默认展开的节点，由 node-key 组
 const rulesList = ref([]); // 虚拟树的节点列表数据
 const treeHeight = ref(1); // 虚拟树的高度
 const elTreeRef = ref(null); // 虚拟树
+const checkStrictly = ref(false); // 虚拟树父子节点是否严格不关联(false表示关联)
 
-// 当前用户拥有的权限id
+// 当前角色id
+const roleId = ref(0);
+// 当前角色拥有的权限id
 const ruleIds = ref([]);
 
-// 打开抽屉组件
+// 打开抽屉组件，渲染虚拟树
 const openSetRuleDrawer = async (row) => {
+  roleId.value = row.id;
   treeHeight.value = window.innerHeight - 170;
+  checkStrictly.value = true;
   try {
     let res = await getRulesList();
     rulesList.value = res.list;
-    console.log(res);
     defaultExpandedKeys.value = res.list.map((item) => item.id); // 设置默认展开的节点
 
     setRuleFormDrawerRef.value.open();
@@ -99,6 +105,7 @@ const openSetRuleDrawer = async (row) => {
     // 设置虚拟树的默认勾选节点
     setTimeout(() => {
       elTreeRef.value.setCheckedKeys(ruleIds.value); // 注意要在打开抽屉之后调用，注意要异步
+      checkStrictly.value = false; // 渲染默认选择节点后，再设置父子节点关联
     }, 100);
   } catch (err) {
     console.log("渲染菜单及权限失败: ", err);
@@ -106,7 +113,24 @@ const openSetRuleDrawer = async (row) => {
 };
 
 // 提交
-const handleSetRulesSubmit = () => {};
+const handleSetRulesSubmit = async () => {
+  setRuleFormDrawerRef.value.showLoading();
+  try {
+    await setRoleRules(roleId.value, ruleIds.value);
+    toast("配置权限成功");
+    setRuleFormDrawerRef.value.close();
+    getData(currentPage.value);
+  } finally {
+    setRuleFormDrawerRef.value.hideLoading();
+  }
+};
+
+// 选择了权限
+const handleTreeCheck = (...e) => {
+  // console.log(e);
+  const { checkedKeys, halfCheckedKeys } = e[1];
+  ruleIds.value = [...checkedKeys, ...halfCheckedKeys];
+};
 </script>
 
 <template>
@@ -211,6 +235,8 @@ const handleSetRulesSubmit = () => {};
         node-key="id"
         :default-expanded-keys="defaultExpandedKeys"
         :height="treeHeight"
+        :check-strictly="checkStrictly"
+        @check="handleTreeCheck"
       >
         <template #default="{ node, data }">
           <div class="flex items-center">
