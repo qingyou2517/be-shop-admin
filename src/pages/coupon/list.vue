@@ -5,6 +5,7 @@ import {
   addCoupon,
   updateCoupon,
   deleteCoupon,
+  updateCouponStatus,
 } from "~/api/coupon.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
@@ -47,7 +48,7 @@ const timeRange = computed({
   },
 });
 
-// get数据、删除操作
+// get数据、删除操作、修改状态
 const option = {
   getList: getCouponList,
   getListSuccess: (res) => {
@@ -58,10 +59,19 @@ const option = {
     total.value = res.totalCount;
   },
   delete: deleteCoupon,
+  updateStatus: updateCouponStatus,
 };
 
-const { tableList, loading, currentPage, total, limit, getData, handleDelete } =
-  useInitTable(option);
+const {
+  tableList,
+  loading,
+  currentPage,
+  total,
+  limit,
+  getData,
+  handleDelete,
+  handleStatusChange,
+} = useInitTable(option);
 
 // 新增、修改
 const formOption = {
@@ -74,6 +84,7 @@ const formOption = {
     start_time: 0,
     end_time: 0,
     order: 50,
+    desc: "",
   },
   rules: {
     name: [
@@ -190,17 +201,16 @@ const {
           >
             修改
           </el-button>
+
           <el-popconfirm
             title="是否让它失效?"
             confirmButtonText="确认"
             cancelButtonText="取消"
-            @confirm=""
+            @confirm="handleStatusChange(0, row)"
             v-if="row.statusText === '领取中'"
           >
             <template #reference>
-              <el-button type="danger" size="small" @click="handleEdit(row)">
-                失效
-              </el-button>
+              <el-button type="danger" size="small"> 失效 </el-button>
             </template>
           </el-popconfirm>
 
@@ -281,7 +291,7 @@ const {
           />
         </el-form-item>
         <el-form-item label="描述">
-          <el-input v-model="form.content" type="textarea" :rows="4"></el-input>
+          <el-input v-model="form.desc" type="textarea" :rows="4"></el-input>
         </el-form-item>
       </el-form>
     </FormDrawer>

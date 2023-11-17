@@ -16,3 +16,8 @@ export function updateCoupon(id, data) {
 export function deleteCoupon(id) {
   return axios.post(`/admin/coupon/${id}/delete`);
 }
+
+// 让优惠券失效
+export function updateCouponStatus(id) {
+  return axios.post(`/admin/coupon/${id}/update_status`, { status: 0 });
+}

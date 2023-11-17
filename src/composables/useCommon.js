@@ -193,6 +193,7 @@ export function useInitForm(option = {}) {
 
   // 修改管理员信息
   const handleEdit = (item) => {
+    console.log(1111);
     updateId.value = item.id;
     resetForm(item);
     drawerTitle.value = "修改";
