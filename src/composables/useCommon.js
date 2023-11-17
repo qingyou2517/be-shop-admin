@@ -1,4 +1,4 @@
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import { toast } from "~/composables/util.js";
 
 // 搜索、列表展示、分页交互、修改状态、删除表格项
@@ -79,6 +79,34 @@ export function useInitTable(option = {}) {
     }
   };
 
+  // 多选
+  const ids = ref([]);
+  const handleSelectionChange = (e) => {
+    ids.value = e.map((item) => item.id);
+  };
+
+  // 批量删除
+  const multipleTableRef = ref(null);
+  const handleMultiDelete = async () => {
+    loading.value = true;
+    try {
+      await option.delete(ids.value);
+      toast("删除成功");
+      // 清空多选框的选中标记
+      if (multipleTableRef.value) {
+        multipleTableRef.value.clearSelection();
+      }
+      getData(1);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 批量删除按钮是否可点击
+  const hasSelect = computed(() => {
+    return ids.value.length > 0;
+  });
+
   return {
     tableList,
     loading,
@@ -90,6 +118,10 @@ export function useInitTable(option = {}) {
     getData,
     handleStatusChange,
     handleDelete,
+    handleSelectionChange,
+    multipleTableRef,
+    handleMultiDelete,
+    hasSelect,
   };
 }
 

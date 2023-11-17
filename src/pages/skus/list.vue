@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue";
 import {
   getSkusList,
   addSku,
@@ -36,6 +35,10 @@ const {
   getData,
   handleStatusChange,
   handleDelete,
+  handleSelectionChange,
+  multipleTableRef,
+  handleMultiDelete,
+  hasSelect,
 } = useInitTable(option);
 
 // 新增、修改
@@ -78,34 +81,6 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
-
-// 多选
-const ids = ref([]);
-const handleSelectionChange = (e) => {
-  ids.value = e.map((item) => item.id);
-};
-
-// 批量删除
-const multipleTableRef = ref(null);
-const handleMultiDelete = async () => {
-  loading.value = true;
-  try {
-    await deleteSkus(ids.value);
-    toast("删除成功");
-    // 清空多选框的选中标记
-    if (multipleTableRef.value) {
-      multipleTableRef.value.clearSelection();
-    }
-    getData(1);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// 批量删除按钮是否可点击
-const hasSelect = computed(() => {
-  return ids.value.length > 0;
-});
 </script>
 
 <template>
