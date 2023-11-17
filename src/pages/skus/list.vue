@@ -9,6 +9,7 @@ import {
 } from "~/api/sku.js";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
+import TagInput from "~/components/TagInput.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 列表展示、修改状态、删除列表项
@@ -134,7 +135,12 @@ const {
     </div>
 
     <!-- 页面保持一个根节点，防止切换页面时 vue transition 失效 -->
-    <FormDrawer ref="formDrawerRef" :title="drawerTitle" @submit="handleSubmit">
+    <FormDrawer
+      destroyOnClose
+      ref="formDrawerRef"
+      :title="drawerTitle"
+      @submit="handleSubmit"
+    >
       <el-form
         :model="form"
         ref="formRef"
@@ -158,7 +164,7 @@ const {
           </el-switch>
         </el-form-item>
         <el-form-item label="规格值" prop="default">
-          <el-input v-model="form.default" type="textarea" :rows="4"></el-input>
+          <TagInput v-model="form.default"></TagInput>
         </el-form-item>
       </el-form>
     </FormDrawer>
