@@ -67,7 +67,7 @@ const dynamicRoutes = [
     name: "/skus/list",
     component: SkusList,
     meta: {
-      title: "通用规格管理",
+      title: "规格管理",
     },
   },
   {

@@ -1,7 +1,7 @@
 import { ref, reactive, computed } from "vue";
 import { toast } from "~/composables/util.js";
 
-// 搜索、列表展示、分页交互、修改状态、删除表格项
+// 搜索、列表展示、分页交互、修改状态、删除表格项、批量删除
 export function useInitTable(option = {}) {
   const tableList = ref([]);
   const loading = ref(false);

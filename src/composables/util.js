@@ -39,3 +39,16 @@ export function showPrompt(title, value = "") {
     inputValue: value,
   });
 }
+
+// 将 query 对象转为 url
+export function queryParams(query) {
+  let q = [];
+  for (const key in query) {
+    if (query[key]) {
+      q.push(`${key}=${encodeURIComponent(query[key])}`);
+    }
+  }
+  let str = q.join("&"); // 如：limit=10&keyword=ceshi
+  str = str ? "?" + str : "";
+  return str; // 如：?limit=10&keyword=ceshi
+}

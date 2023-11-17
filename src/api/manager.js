@@ -1,6 +1,8 @@
 // 拿到自定义的 axios 实例
 import axios from "~/axios";
 
+import { queryParams } from "~/composables/util";
+
 export function login(username, password) {
   return axios.post("/admin/login", {
     username,
@@ -28,14 +30,8 @@ export function updatePassword({ oldpassword, password, repassword }) {
 }
 
 // 获取管理员列表
-export function getManagerList(
-  page,
-  query = {
-    limit: 10,
-    keyword: "ceshi",
-  }
-) {
-  return axios.get(`/admin/manager/${page}`, { params: query });
+export function getManagerList(page, query = {}) {
+  return axios.get(`/admin/manager/${page}` + queryParams(query));
 }
 
 // 修改管理员状态
