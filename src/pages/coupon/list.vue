@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import {
   getCouponList,
   addCoupon,
@@ -32,6 +32,21 @@ const getClass = (row) => {
   };
 };
 
+// 日期选择器
+const timeRange = computed({
+  get() {
+    if (form.start_time && form.end_time) {
+      return [form.start_time, form.end_time];
+    } else {
+      return [];
+    }
+  },
+  set(val) {
+    form.start_time = val[0];
+    form.end_time = val[1];
+  },
+});
+
 // get数据、删除操作
 const option = {
   getList: getCouponList,
@@ -48,7 +63,7 @@ const option = {
 const { tableList, loading, currentPage, total, limit, getData, handleDelete } =
   useInitTable(option);
 
-// 新增、修改公告
+// 新增、修改
 const formOption = {
   defaultForm: {
     name: "",
@@ -115,6 +130,16 @@ const formOption = {
   getData,
   update: updateCoupon,
   add: addCoupon,
+  beforeSubmit: (formObj) => {
+    // 修改优惠券起止时间的格式为时间戳
+    if (typeof formObj.start_time !== "number") {
+      formObj.start_time = new Date(formObj.start_time).getTime();
+    }
+    if (typeof formObj.end_time !== "number") {
+      formObj.end_time = new Date(formObj.end_time).getTime();
+    }
+    return formObj;
+  },
 };
 
 const {
@@ -165,14 +190,20 @@ const {
           >
             修改
           </el-button>
-          <el-button
-            type="danger"
-            size="small"
-            @click="handleEdit(row)"
-            v-else-if="row.statusText === '领取中'"
+          <el-popconfirm
+            title="是否让它失效?"
+            confirmButtonText="确认"
+            cancelButtonText="取消"
+            @confirm=""
+            v-if="row.statusText === '领取中'"
           >
-            失效
-          </el-button>
+            <template #reference>
+              <el-button type="danger" size="small" @click="handleEdit(row)">
+                失效
+              </el-button>
+            </template>
+          </el-popconfirm>
+
           <el-popconfirm
             title="是否删除?"
             confirmButtonText="确认"
@@ -213,6 +244,45 @@ const {
         label-width="120px"
         :inline="false"
       >
+        <el-form-item label="优惠券名称" prop="name">
+          <el-input v-model="form.name" placeholder="优惠券名称"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" prop="type" class="flex items-center">
+          <el-radio-group v-model="form.type">
+            <el-radio :label="0" size="large">满减</el-radio>
+            <el-radio :label="1" size="large">折扣</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="面值" prop="value">
+          <el-input v-model="form.value" class="w-[50%]">
+            <template #append>{{ form.type === 0 ? "元" : "折" }}</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="发行量" prop="total">
+          <el-input-number v-model="form.total" label="" :min="0" :max="1000">
+          </el-input-number>
+        </el-form-item>
+        <el-form-item label="最低使用价格" prop="min_price">
+          <el-input v-model="form.min_price"></el-input>
+        </el-form-item>
+        <el-form-item label="排序" prop="order">
+          <el-input-number v-model="form.order" label="" :min="0" :max="1000">
+          </el-input-number>
+        </el-form-item>
+        <el-form-item label="活动时间">
+          <el-date-picker
+            v-model="timeRange"
+            type="datetimerange"
+            range-separator="To"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :editable="false"
+          />
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input v-model="form.content" type="textarea" :rows="4"></el-input>
+        </el-form-item>
       </el-form>
     </FormDrawer>
   </el-card>

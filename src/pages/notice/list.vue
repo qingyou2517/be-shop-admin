@@ -19,7 +19,7 @@ const option = {
 const { tableList, loading, currentPage, total, limit, getData, handleDelete } =
   useInitTable(option);
 
-// 新增、修改公告
+// 新增、修改
 const formOption = {
   defaultForm: {
     title: "",

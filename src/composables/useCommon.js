@@ -143,13 +143,23 @@ export function useInitForm(option = {}) {
       if (!valid) return;
 
       formDrawerRef.value.showLoading();
+
+      // 访问后台接口前的数据处理(如优惠券的起止时间：前台展示&后台返回均为字符串格式，但后台上传要求是时间戳格式)
+      let data = {};
+      if (option.beforeSubmit && typeof option.beforeSubmit === "function") {
+        // 对form对象深拷贝，因为beforeSubmit要修改表单数据
+        data = option.beforeSubmit({ ...form });
+      } else {
+        data = form;
+      }
+      // 访问后台接口
       try {
         if (updateId.value !== 0) {
-          await option.update(updateId.value, form);
+          await option.update(updateId.value, data);
           toast("修改成功");
           option.getData(option.currentPage.value);
         } else {
-          await option.add(form);
+          await option.add(data);
           toast("新增成功");
           option.getData(1);
         }
