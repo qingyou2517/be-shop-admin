@@ -10,6 +10,7 @@ import {
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import TagInput from "~/components/TagInput.vue";
+import { toast } from "~/composables/util.js";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 列表展示、修改状态、删除列表项
@@ -77,13 +78,55 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
+
+// 多选
+const ids = ref([]);
+const handleSelectionChange = (e) => {
+  ids.value = e.map((item) => item.id);
+};
+
+// 批量删除
+const multipleTableRef = ref(null);
+const handleMultiDelete = async () => {
+  loading.value = true;
+  try {
+    await deleteSkus(ids.value);
+    toast("删除成功");
+    // 清空多选框的选中标记
+    if (multipleTableRef.value) {
+      multipleTableRef.value.clearSelection();
+    }
+    getData(1);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 批量删除按钮是否可点击
+const hasSelect = computed(() => {
+  return ids.value.length > 0;
+});
 </script>
 
 <template>
   <el-card shadow="never" class="border-0">
-    <ListHeader @create="handleAdd" @refresh="getData"></ListHeader>
+    <ListHeader
+      @create="handleAdd"
+      @refresh="getData"
+      @delete="handleMultiDelete"
+      layout="create,delete,refresh"
+      :hasSelect="hasSelect"
+    ></ListHeader>
 
-    <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
+    <el-table
+      ref="multipleTableRef"
+      :data="tableList"
+      style="width: 100%"
+      stripe
+      v-loading="loading"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="55" />
       <el-table-column prop="name" label="规格名称" class="truncate" />
       <el-table-column
         prop="default"
