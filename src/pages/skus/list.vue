@@ -12,7 +12,7 @@ import TagInput from "~/components/TagInput.vue";
 import { toast } from "~/composables/util.js";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-// 列表展示、修改状态、删除列表项
+// 列表展示、修改状态、删除列表项、批量删除
 const option = {
   getList: getSkusList,
   getListSuccess: (res) => {

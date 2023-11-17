@@ -1,12 +1,11 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import {
   getNoticeList,
   addNotice,
   updateNotice,
   deleteNotice,
 } from "~/api/notice.js";
-import { toast } from "~/composables/util";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
@@ -58,9 +57,6 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
-
-// 表单数据
-const updateId = ref(0);
 </script>
 
 <template>
@@ -71,20 +67,15 @@ const updateId = ref(0);
       <el-table-column prop="title" label="公告标题" class="truncate" />
       <el-table-column prop="create_time" label="发布时间" width="250" />
       <el-table-column label="操作" align="center" width="180">
-        <template #default="scope">
-          <el-button
-            type="primary"
-            text
-            size="small"
-            @click="handleEdit(scope.row)"
-          >
+        <template #default="{ row }">
+          <el-button type="primary" text size="small" @click="handleEdit(row)">
             修改
           </el-button>
           <el-popconfirm
             title="是否删除该公告?"
             confirmButtonText="确认"
             cancelButtonText="取消"
-            @confirm="handleDelete(scope.row.id)"
+            @confirm="handleDelete(row.id)"
           >
             <template #reference>
               <el-button type="primary" text size="small">删除</el-button>
