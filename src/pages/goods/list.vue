@@ -181,16 +181,29 @@ const tabBars = [
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column label="商品" width="200">
+        <el-table-column label="商品" width="350">
           <template #default="{ row }">
-            <div class="flex items-center">
+            <div class="flex">
               <el-image
                 :src="row.cover"
                 fit="cover"
-                class="w-[50px] h-[50px]"
+                class="w-[50px] h-[50px] mr-3 rounded"
               ></el-image>
-              <div class="ml-3">
-                <h6>{{ row.title }}</h6>
+              <div class="flex-1">
+                <p>{{ row.title }}</p>
+                <div>
+                  <span class="text-rose-500">¥{{ row.min_price }}</span>
+                  <el-divider direction="vertical"></el-divider>
+                  <span class="text-gray-500 text-xs"
+                    >¥{{ row.min_oprice }}</span
+                  >
+                </div>
+                <p class="text-gray-400 text-xs mb-1">
+                  分类：{{ row.category ? row.category.name : "未分类" }}
+                </p>
+                <p class="text-gray-400 text-xs mb-1">
+                  创建时间：{{ row.create_time }}
+                </p>
               </div>
             </div>
           </template>
@@ -204,20 +217,29 @@ const tabBars = [
             <el-tag class="ml-2" type="danger" v-else>仓库</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="审核状态" width="120">
+        <el-table-column
+          label="审核状态"
+          width="120"
+          align="center"
+          v-if="searchForm.tab !== 'delete'"
+        >
           <template #default="{ row }">
-            <div class="flex flex-col items-center justify-center">
+            <div
+              v-if="row.ischeck === 0"
+              class="flex flex-col items-center justify-center"
+            >
               <el-button type="success" size="small" plain>审核通过</el-button>
               <el-button type="danger" size="small" plain class="mt-2"
                 >审核拒绝</el-button
               >
             </div>
+            <span v-else>{{ row.ischeck === 1 ? "通过" : "拒绝" }}</span>
           </template>
         </el-table-column>
         <el-table-column label="总库存" prop="stock" align="center" />
         <el-table-column label="操作" align="center" width="500">
           <template #default="scope">
-            <div>
+            <div v-if="searchForm.tab !== 'delete'">
               <el-button
                 type="primary"
                 text
@@ -246,6 +268,7 @@ const tabBars = [
                 </template>
               </el-popconfirm>
             </div>
+            <div v-else>暂无操作</div>
           </template>
         </el-table-column>
       </el-table>
