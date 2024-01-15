@@ -10,6 +10,8 @@ import {
 import FormDrawer from "~/components/FormDrawer.vue";
 import ChooseImage from "~/components/ChooseImage.vue";
 import ListHeader from "~/components/ListHeader.vue";
+import Search from "../../components/Search.vue";
+import SearchItem from "../../components/SearchItem.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 所属角色，只在管理员模块使用，所以不抽离到公共模块
@@ -98,7 +100,18 @@ const {
 
 <template>
   <el-card shadow="never" class="border-0">
-    <el-form
+    <!-- 搜索 -->
+    <Search :model="searchForm" @search="getData" @reset="resetSearchForm">
+      <SearchItem label="关键词">
+        <el-input
+          v-model="searchForm.keyword"
+          placeholder="管理员昵称"
+          clearable
+          size="small"
+        ></el-input>
+      </SearchItem>
+    </Search>
+    <!-- <el-form
       :model="searchForm"
       label-width="80px"
       class="mb-3 flex items-center"
@@ -117,7 +130,7 @@ const {
         >
         <el-button size="small" @click="resetSearchForm">重置</el-button>
       </el-form-item>
-    </el-form>
+    </el-form> -->
 
     <ListHeader @create="handleAdd" @refresh="getData"></ListHeader>
 

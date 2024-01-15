@@ -7,9 +7,12 @@ import {
   updateGood,
   deleteGoods,
 } from "~/api/goods";
+import { getCategoryList } from "~/api/category";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ChooseImage from "~/components/ChooseImage.vue";
 import ListHeader from "~/components/ListHeader.vue";
+import Search from "../../components/Search.vue";
+import SearchItem from "../../components/SearchItem.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 所属角色，只在管理员模块使用，所以不抽离到公共模块
@@ -128,6 +131,10 @@ const tabBars = [
     name: "回收站",
   },
 ];
+
+// 商品分类
+const categoryList = ref([]);
+getCategoryList().then((res) => (categoryList.value = res));
 </script>
 
 <template>
@@ -143,26 +150,37 @@ const tabBars = [
     </el-tabs>
 
     <el-card shadow="never" class="border-0">
-      <el-form
-        :model="searchForm"
-        label-width="80px"
-        class="mb-3 flex items-center"
-      >
-        <el-form-item label="关键词" class="w-1/2">
+      <Search :model="searchForm" @search="getData" @reset="resetSearchForm">
+        <!-- 通用搜索：调用<Search>组件的默认插槽 -->
+        <SearchItem label="关键词">
           <el-input
             v-model="searchForm.title"
             placeholder="商品名称"
             clearable
             size="small"
           ></el-input>
-        </el-form-item>
-        <el-form-item class="ml-auto flex items-center">
-          <el-button type="primary" size="small" @click="getData()"
-            >搜索</el-button
-          >
-          <el-button size="small" @click="resetSearchForm">重置</el-button>
-        </el-form-item>
-      </el-form>
+        </SearchItem>
+
+        <!-- 高级搜索：调用<Search>组件的具名插槽 -->
+        <template #showAdvanced>
+          <SearchItem label="商品分类">
+            <el-select
+              v-model="searchForm.category_id"
+              value-key=""
+              placeholder="请选择商品分类"
+              clearable
+            >
+              <el-option
+                v-for="item in categoryList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </SearchItem>
+        </template>
+      </Search>
 
       <ListHeader
         layout="create,delete,refresh"

@@ -37,7 +37,7 @@ router.beforeEach(async (to, from, next) => {
 
   // 获取和设置网页 title
   const title = to.meta.title ? to.meta.title : "";
-  document.title = title + " - 商城后台";
+  document.title = title + " - shop-admin";
 
   // 重定向：依靠 hasNewRoutes 来避免无限重定向
   hasNewRoutes ? next(to.fullPath) : next();
