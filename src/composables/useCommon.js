@@ -59,7 +59,7 @@ export function useInitTable(option = {}) {
       toast("修改状态成功");
       row.status = status;
     } catch (err) {
-      console.log("修改状态失败：", err);
+      console.error("修改状态失败：", err);
     } finally {
       row.switchLoading = false;
     }
@@ -88,6 +88,10 @@ export function useInitTable(option = {}) {
   // 批量删除
   const multipleTableRef = ref(null);
   const handleMultiDelete = async () => {
+    if (ids.value.length <= 0) {
+      toast("需要先勾选操作对象", "error");
+      return;
+    }
     loading.value = true;
     try {
       await option.delete(ids.value);
@@ -97,6 +101,28 @@ export function useInitTable(option = {}) {
         multipleTableRef.value.clearSelection();
       }
       getData(1);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 批量修改状态：即批量上架、下架
+  const handleMultiStatusChange = async (status) => {
+    if (ids.value.length <= 0) {
+      toast("需要选择至少一件商品", "error");
+      return;
+    }
+    loading.value = true;
+    try {
+      await option.updateStatus(ids.value, status);
+      toast("修改状态成功");
+      // 清空多选框的选中标记
+      if (multipleTableRef.value) {
+        multipleTableRef.value.clearSelection();
+      }
+      getData();
+    } catch (err) {
+      console.error("修改状态失败：", err);
     } finally {
       loading.value = false;
     }
@@ -121,6 +147,7 @@ export function useInitTable(option = {}) {
     handleSelectionChange,
     multipleTableRef,
     handleMultiDelete,
+    handleMultiStatusChange,
     hasSelect,
   };
 }
@@ -179,11 +206,14 @@ export function useInitForm(option = {}) {
   const resetForm = (data) => {
     if (formRef.value) formRef.value.clearValidate(); // 去除表单的校验报错信息
     for (const key in data) {
-      form[key] = data[key];
+      // 过滤对象属性：只填充 defaultForm 含有的属性
+      if (option.defaultForm.hasOwnProperty(key)) {
+        form[key] = data[key];
+      }
     }
   };
 
-  // 新增管理员
+  // 新增
   const handleAdd = () => {
     updateId.value = 0;
     resetForm(option.defaultForm);
@@ -191,15 +221,13 @@ export function useInitForm(option = {}) {
     formDrawerRef.value.open();
   };
 
-  // 修改管理员信息
+  // 编辑修改
   const handleEdit = (item) => {
-    console.log(1111);
     updateId.value = item.id;
     resetForm(item);
     drawerTitle.value = "修改";
     formDrawerRef.value.open();
   };
-
   return {
     formDrawerRef,
     drawerTitle,

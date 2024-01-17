@@ -15,10 +15,7 @@ import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-// 所属角色，只在管理员模块使用，所以不抽离到公共模块
-const rolesList = ref([]);
-
-// 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除
+// 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、批量上架与下架
 const option = {
   searchForm: {
     title: "",
@@ -46,15 +43,15 @@ const {
   total,
   limit,
   getData,
-  handleStatusChange,
   handleDelete,
   handleSelectionChange,
   multipleTableRef,
   handleMultiDelete,
+  handleMultiStatusChange,
   hasSelect,
 } = useInitTable(option);
 
-// 新增、修改管理员
+// 新增、修改
 const formOption = {
   defaultForm: {
     title: "",
@@ -143,7 +140,6 @@ const tabBars = [
     name: "回收站",
   },
 ];
-
 // 商品分类
 const categoryList = ref([]);
 getCategoryList().then((res) => (categoryList.value = res));
@@ -199,8 +195,20 @@ getCategoryList().then((res) => (categoryList.value = res));
         @create="handleAdd"
         @refresh="getData"
         @delete="handleMultiDelete"
-        :hasSelect="hasSelect"
-      ></ListHeader>
+      >
+        <el-button
+          size="small"
+          @click="handleMultiStatusChange(1)"
+          v-if="searchForm.tab === 'all' || searchForm.tab === 'off'"
+          >上架</el-button
+        >
+        <el-button
+          size="small"
+          @click="handleMultiStatusChange(0)"
+          v-if="searchForm.tab === 'all' || searchForm.tab === 'saling'"
+          >下架</el-button
+        >
+      </ListHeader>
 
       <el-table
         ref="multipleTableRef"
@@ -267,7 +275,7 @@ getCategoryList().then((res) => (categoryList.value = res));
           </template>
         </el-table-column>
         <el-table-column label="总库存" prop="stock" align="center" />
-        <el-table-column label="操作" align="center" width="500">
+        <el-table-column label="操作" align="center" width="450">
           <template #default="scope">
             <div v-if="searchForm.tab !== 'delete'">
               <el-button

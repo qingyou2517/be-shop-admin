@@ -90,7 +90,6 @@ const {
       @refresh="getData"
       @delete="handleMultiDelete"
       layout="create,delete,refresh"
-      :hasSelect="hasSelect"
     ></ListHeader>
 
     <el-table

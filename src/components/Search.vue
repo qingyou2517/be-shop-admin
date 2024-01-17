@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="searchForm" label-width="80px" class="mb-3">
+  <el-form label-width="80px" class="mb-3">
     <el-row :gutter="20">
       <!-- 默认插槽：对应通用搜索 -->
       <slot></slot>
