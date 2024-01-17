@@ -2,6 +2,7 @@
 import { ref, defineEmits } from "vue";
 import ImageAside from "~/components/ImageAside.vue";
 import ImageMain from "~/components/ImageMain.vue";
+import { toast } from "../composables/util";
 
 const dialogVisible = ref(false);
 
@@ -32,8 +33,12 @@ const openUpload = () => {
 };
 
 // 修改 v-model 绑定的数据
-defineProps({
+const props = defineProps({
   modelValue: [String, Array],
+  limit: {
+    type: Number,
+    default: 1,
+  },
 });
 const emit = defineEmits(["update:modelValue"]);
 
@@ -45,20 +50,70 @@ const handleChooseImage = (image) => {
 
 // 选好了图片
 const submitImage = () => {
-  emit("update:modelValue", urls[0]);
+  let urlArr = [];
+  // 只展示单张图片
+  if (props.limit === 1) {
+    urlArr = urls[0];
+  } else {
+    // 展示轮播图：modelValue为打开即展示的url数组，urls为新选图片组成的url数组
+    console.log("modelValue:", props.modelValue);
+    console.log("urls:", urls);
+    urlArr = [...props.modelValue, ...urls];
+    if (urlArr.length > props.limit) {
+      return toast(
+        `总共限定${props.limit}张，最多还能选择${
+          props.limit - props.modelValue.length
+        }张`
+      );
+    }
+  }
+  emit("update:modelValue", urlArr);
   close();
+};
+
+// 删除轮播图的某张图片
+const removeImage = (index) => {
+  if (Array.isArray(props.modelValue)) {
+    props.modelValue.splice(index, 1);
+    emit("update:modelValue", props.modelValue);
+  }
 };
 </script>
 
 <template>
+  <!-- 展示图片 -->
   <div v-if="modelValue">
+    <!-- 只需展示单张图 -->
     <el-image
       :src="modelValue"
       fit="cover"
       class="w-25 h-25 rounded border mr-2"
+      v-if="typeof modelValue === 'string'"
     />
+    <!-- 需要展示轮播图 -->
+    <div class="flex items-center justify-center" v-else>
+      <div
+        class="relative mx-1 my-2 w-25 h-25"
+        v-for="(url, index) in modelValue"
+        :key="index"
+      >
+        <el-icon
+          class="absolute right-[5px] top-[5px] cursor-pointer bg-white rounded-full"
+          style="z-index: 10"
+          @click="removeImage(index)"
+        >
+          <CircleClose></CircleClose
+        ></el-icon>
+        <el-image
+          :src="url"
+          fit="cover"
+          class="w-25 h-25 rounded border mr-2"
+        />
+      </div>
+    </div>
   </div>
 
+  <!-- 选择上传图片 -->
   <div
     class="w-25 h-25 rounded border flex items-center justify-center cursor-pointer hover:bg-gray-100"
     @click="open"
@@ -89,6 +144,7 @@ const submitImage = () => {
         <ImageMain
           ref="imageMainRef"
           :showChoose="true"
+          :limit="limit"
           @choose="handleChooseImage"
         />
       </el-container>

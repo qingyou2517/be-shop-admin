@@ -55,11 +55,15 @@ defineExpose({
   openUploadFile,
 });
 
-// 是否显示选择图片按钮
-defineProps({
+// 是否显示选择图片按钮、限制选择图片的数目
+const props = defineProps({
   showChoose: {
     type: Boolean,
     default: false,
+  },
+  limit: {
+    type: Number,
+    default: 1,
   },
 });
 
@@ -69,8 +73,8 @@ const checkedImage = computed(() => {
 });
 const emit = defineEmits(["choose"]);
 function handleChooseChange(item) {
-  if (item.checked && checkedImage.value.length > 1) {
-    toast("一次最多只能选择一张图片", "error");
+  if (item.checked && checkedImage.value.length > props.limit) {
+    toast(`一次最多只能选择${props.limit}张图片`, "error");
     item.checked = false;
     return;
   }

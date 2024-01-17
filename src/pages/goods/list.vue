@@ -13,6 +13,7 @@ import ChooseImage from "~/components/ChooseImage.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
+import banners from "./banners.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、批量上架与下架
@@ -25,7 +26,7 @@ const option = {
   getList: getGoodsList,
   getListSuccess: (res) => {
     tableList.value = res.list.map((item) => {
-      item.switchLoading = false;
+      item.bannersLoading = false; // 为"设置轮播图"按钮添加 loading 效果
       return item;
     });
     total.value = res.totalCount;
@@ -143,6 +144,12 @@ const tabBars = [
 // 商品分类
 const categoryList = ref([]);
 getCategoryList().then((res) => (categoryList.value = res));
+
+// 轮播图
+const bannersRef = ref(null);
+const handleSetBanners = (row) => {
+  bannersRef.value.open(row);
+};
 </script>
 
 <template>
@@ -289,7 +296,15 @@ getCategoryList().then((res) => (categoryList.value = res));
               <el-button type="primary" text size="small" @click="">
                 商品规格
               </el-button>
-              <el-button type="primary" text size="small" @click="">
+              <el-button
+                :type="
+                  scope.row.goods_banner.length === 0 ? 'danger' : 'primary'
+                "
+                text
+                size="small"
+                :loading="scope.row.bannersLoading"
+                @click="handleSetBanners(scope.row)"
+              >
                 设置轮播图
               </el-button>
               <el-button type="primary" text size="small" @click="">
@@ -325,6 +340,7 @@ getCategoryList().then((res) => (categoryList.value = res));
       <FormDrawer
         ref="formDrawerRef"
         :title="drawerTitle"
+        :destroyOnClose="true"
         @submit="handleSubmit"
       >
         <el-form
@@ -410,6 +426,8 @@ getCategoryList().then((res) => (categoryList.value = res));
         </el-form>
       </FormDrawer>
     </el-card>
+
+    <banners ref="bannersRef" @reload="getData"></banners>
   </div>
 </template>
 
