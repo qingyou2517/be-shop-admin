@@ -7,13 +7,19 @@ import { toast } from "../composables/util";
 const dialogVisible = ref(false);
 
 // 打开对话框，选择图片
-const open = () => {
+let callbackFunction = null;
+const open = (callback = null) => {
+  callbackFunction = callback;
   dialogVisible.value = true;
 };
 // 关闭对话框
 const close = () => {
   dialogVisible.value = false;
 };
+
+defineExpose({
+  open,
+});
 
 // 新增图片分类 => 打开抽屉组件：调用ImageAside.vue暴露的方法
 const imageAsideRef = ref(null);
@@ -39,6 +45,11 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  // 是否显示按钮、是否回显图片：如Editor.vue点击选择图片时，不需要在富文本编辑器内显示添加按钮，而且自己有回显图片的手段
+  preview: {
+    type: Boolean,
+    default: true,
+  },
 });
 const emit = defineEmits(["update:modelValue"]);
 
@@ -55,19 +66,26 @@ const submitImage = () => {
   if (props.limit === 1) {
     urlArr = urls[0];
   } else {
-    // 展示轮播图：modelValue为打开即展示的url数组，urls为新选图片组成的url数组
-    console.log("modelValue:", props.modelValue);
-    console.log("urls:", urls);
-    urlArr = [...props.modelValue, ...urls];
-    if (urlArr.length > props.limit) {
-      return toast(
-        `总共限定${props.limit}张，最多还能选择${
-          props.limit - props.modelValue.length
-        }张`
-      );
+    // modelValue为打开即展示的url数组，urls为新选图片组成的url数组
+    // 多张图片且需要回显到ChooseImage内：如轮播图
+    if (props.preview) {
+      urlArr = [...props.modelValue, ...urls];
+      if (urlArr.length > props.limit) {
+        const rear = props.limit - props.modelValue.length;
+        return toast(`总共限定${props.limit}张，最多还能选择${rear}张`);
+      }
+    } else {
+      // 多张图片但是不需要回显到ChooseImage内：如富文本编辑器，搜集url回显到编辑器内
+      urlArr = urls;
+      if (urlArr.length > props.limit) {
+        return toast(`最多还能选择${props.limit}张`);
+      }
     }
   }
-  emit("update:modelValue", urlArr);
+  if (urlArr && !props.preview) {
+    callbackFunction(urlArr);
+    emit("update:modelValue", urlArr);
+  }
   close();
 };
 
@@ -82,7 +100,7 @@ const removeImage = (index) => {
 
 <template>
   <!-- 展示图片 -->
-  <div v-if="modelValue">
+  <div v-if="modelValue && preview">
     <!-- 只需展示单张图 -->
     <el-image
       :src="modelValue"
@@ -113,14 +131,15 @@ const removeImage = (index) => {
     </div>
   </div>
 
-  <!-- 选择上传图片 -->
+  <!-- 选择上传图片：按钮 -->
   <div
     class="w-25 h-25 rounded border flex items-center justify-center cursor-pointer hover:bg-gray-100"
     @click="open"
+    v-if="preview"
   >
     <el-icon :size="25"><Plus /></el-icon>
   </div>
-
+  <!-- 选择上传图片：对话框 -->
   <el-dialog title="选择图片" v-model="dialogVisible" width="80%" top="5vh">
     <el-container class="bg-white rounded h-[70vh]">
       <el-header class="border-bottom flex items-center">

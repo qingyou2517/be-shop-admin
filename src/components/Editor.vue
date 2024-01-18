@@ -1,10 +1,12 @@
 <template>
   <editor v-model="content" tag-name="div" :init="init" />
+  <ChooseImage ref="chooseImageRef" :limit="9" :preview="false"></ChooseImage>
 </template>
 
 <script setup>
 import tinymce from "tinymce/tinymce";
 import Editor from "@tinymce/tinymce-vue";
+import ChooseImage from "./ChooseImage.vue";
 import { ref, watch } from "vue";
 import "tinymce/skins/content/default/content.css";
 import "tinymce/themes/silver/theme"; // 引用主题文件
@@ -49,6 +51,9 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 
+// 点击工具栏的图片按钮，跳转ChooseImage组件
+const chooseImageRef = ref(null);
+
 // 配置：用于初始化编辑器
 const init = {
   language_url: "/tinymce/langs/zh-Hans.js", // 中文语言包路径
@@ -65,7 +70,7 @@ const init = {
   plugins:
     "wordcount visualchars visualblocks template searchreplace save quickbars preview pagebreak nonbreaking media insertdatetime importcss image help fullscreen directionality codesample code charmap link code table lists advlist anchor autolink autoresize autosave",
   toolbar:
-    "formats undo redo fontsizeselect fontselect ltr rtl searchreplace media | outdent indent aligncenter alignleft alignright alignjustify lineheight underline quicklink h2 h3 blockquote numlist bullist table removeformat forecolor backcolor bold italic strikethrough hr link preview fullscreen help ",
+    "formats undo redo fontsizeselect fontselect ltr rtl searchreplace media imageUpload | outdent indent aligncenter alignleft alignright alignjustify lineheight underline quicklink h2 h3 blockquote numlist bullist table removeformat forecolor backcolor bold italic strikethrough hr link preview fullscreen help ",
   content_style: "p {margin: 5px 0; font-size: 14px}",
   fontsize_formats: "12px 14px 16px 18px 24px 36px 48px 56px 72px",
   font_formats:
@@ -74,6 +79,21 @@ const init = {
   elementpath: false,
   resize: false, // 禁止改变大小
   statusbar: false, // 隐藏底部状态栏
+  // 自定义按钮
+  setup: (editor) => {
+    // addButton 的第一个参数作为该自定义按钮的唯一标识
+    editor.ui.registry.addButton("imageUpload", {
+      tooltip: "插入图片",
+      icon: "image",
+      onAction: (e) => {
+        chooseImageRef.value.open((urls) => {
+          urls.forEach((url) => {
+            editor.insertContent(`<img src="${url}" style="width:100%;">`);
+          });
+        });
+      },
+    });
+  },
 };
 
 tinymce.init; // 初始化
