@@ -14,9 +14,10 @@ import ListHeader from "~/components/ListHeader.vue";
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
 import banners from "./banners.vue";
+import content from "./content.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
-// 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、批量上架与下架
+// 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、为按钮添加 loading
 const option = {
   searchForm: {
     title: "",
@@ -27,6 +28,7 @@ const option = {
   getListSuccess: (res) => {
     tableList.value = res.list.map((item) => {
       item.bannersLoading = false; // 为"设置轮播图"按钮添加 loading 效果
+      item.contentLoading = false; // 为"商品详情"按钮添加 loading 效果
       return item;
     });
     total.value = res.totalCount;
@@ -149,6 +151,12 @@ getCategoryList().then((res) => (categoryList.value = res));
 const bannersRef = ref(null);
 const handleSetBanners = (row) => {
   bannersRef.value.open(row);
+};
+
+// 设置商品详情
+const contentRef = ref(null);
+const handleSetContent = (row) => {
+  contentRef.value.open(row);
 };
 </script>
 
@@ -307,7 +315,13 @@ const handleSetBanners = (row) => {
               >
                 设置轮播图
               </el-button>
-              <el-button type="primary" text size="small" @click="">
+              <el-button
+                :type="scope.row.content ? 'primary' : 'danger'"
+                text
+                size="small"
+                :loading="scope.row.contentLoading"
+                @click="handleSetContent(scope.row)"
+              >
                 商品详情
               </el-button>
               <el-popconfirm
@@ -428,6 +442,7 @@ const handleSetBanners = (row) => {
     </el-card>
 
     <banners ref="bannersRef" @reload="getData"></banners>
+    <content ref="contentRef" @reload="getData"></content>
   </div>
 </template>
 
