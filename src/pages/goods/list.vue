@@ -15,6 +15,7 @@ import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
 import banners from "./banners.vue";
 import content from "./content.vue";
+import skus from "./skus.vue";
 import { useInitTable, useInitForm } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、为按钮添加 loading
@@ -29,8 +30,10 @@ const option = {
     tableList.value = res.list.map((item) => {
       item.bannersLoading = false; // 为"设置轮播图"按钮添加 loading 效果
       item.contentLoading = false; // 为"商品详情"按钮添加 loading 效果
+      item.skusLoading = false; // 为"商品规格"按钮添加 loading 效果
       return item;
     });
+    console.log("tabList:", tableList.value);
     total.value = res.totalCount;
   },
   updateStatus: updateGoodsStatus,
@@ -157,6 +160,20 @@ const handleSetBanners = (row) => {
 const contentRef = ref(null);
 const handleSetContent = (row) => {
   contentRef.value.open(row);
+};
+
+// 设置商品规格
+const skusRef = ref(null);
+const handleSetSkus = (row) => {
+  skusRef.value.open(row);
+};
+// 是否设置了商品规格
+const hasSetSkus = (row) => {
+  if (!row.sku_value && row.goods_skus.length === 0) {
+    return false;
+  } else {
+    return true;
+  }
 };
 </script>
 
@@ -301,7 +318,13 @@ const handleSetContent = (row) => {
               >
                 修改
               </el-button>
-              <el-button type="primary" text size="small" @click="">
+              <el-button
+                :type="hasSetSkus(scope.row) ? 'primary' : 'danger'"
+                text
+                size="small"
+                :loading="scope.row.skusLoading"
+                @click="handleSetSkus(scope.row)"
+              >
                 商品规格
               </el-button>
               <el-button
@@ -443,6 +466,7 @@ const handleSetContent = (row) => {
 
     <banners ref="bannersRef" @reload="getData"></banners>
     <content ref="contentRef" @reload="getData"></content>
+    <skus ref="skusRef" @reload="getData"></skus>
   </div>
 </template>
 
