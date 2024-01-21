@@ -59,3 +59,8 @@ export function updateGoodsSkusCard(id, data) {
 export function deleteGoodsSkusCard(id) {
   return axios.post(`/admin/goods_skus_card/${id}/delete`);
 }
+
+// （多规格下）商品规格选项上下排序
+export function sortGoodsSkusCard(data) {
+  return axios.post(`/admin/goods_skus_card/sort`, data);
+}

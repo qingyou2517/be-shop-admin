@@ -52,3 +52,19 @@ export function queryParams(query) {
   str = str ? "?" + str : "";
   return str; // 如：?limit=10&keyword=ceshi
 }
+
+// 数组项前移/上移
+export function useArrayMoveUp(arr, index) {
+  swapArrayItem(arr, index, index - 1);
+}
+
+// 数组项后移/下移
+export function useArrayMoveDown(arr, index) {
+  swapArrayItem(arr, index, index + 1);
+}
+
+// 数组项交换位置
+function swapArrayItem(arr, index1, index2) {
+  // index1: 交换前的位置； index2: 交换后的位置
+  arr[index1] = arr.splice(index2, 1, arr[index1])[0];
+}

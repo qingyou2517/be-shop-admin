@@ -1,9 +1,9 @@
 <template>
-  <el-form-item label="规格选项">
+  <el-form-item label="规格选项" v-loading="bodyLoading">
     <el-card
       shadow="never"
       class="w-full mb-3"
-      v-for="item in skus_card_list"
+      v-for="(item, index) in skus_card_list"
       :key="item.id"
       v-loading="item.loading"
     >
@@ -28,10 +28,19 @@
               </el-button>
             </template>
           </el-input>
-          <el-button class="ml-auto" size="small" @click="">
+          <el-button
+            class="ml-auto"
+            size="small"
+            @click="sortSkusCard('up', index)"
+            :disabled="index === 0"
+          >
             <el-icon><Top /></el-icon>
           </el-button>
-          <el-button size="small" @click="">
+          <el-button
+            size="small"
+            @click="sortSkusCard('down', index)"
+            :disabled="index === skus_card_list.length - 1"
+          >
             <el-icon><Bottom /></el-icon>
           </el-button>
           <el-popconfirm
@@ -62,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import SkusCardItem from "./SkusCardItem.vue";
 import {
   skus_card_list,
@@ -70,6 +79,8 @@ import {
   addSkusCard,
   updateSkusCard,
   deleteSkusCard,
+  sortSkusCard,
+  bodyLoading,
 } from "~/composables/useSkus.js";
 
 const tooltipVisible = ref(false);
