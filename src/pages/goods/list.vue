@@ -33,7 +33,6 @@ const option = {
       item.skusLoading = false; // 为"商品规格"按钮添加 loading 效果
       return item;
     });
-    console.log("tabList:", tableList.value);
     total.value = res.totalCount;
   },
   updateStatus: updateGoodsStatus,

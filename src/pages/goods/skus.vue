@@ -42,7 +42,9 @@
         </el-form-item>
       </template>
       <!-- 多规格 -->
-      <template v-else></template>
+      <template v-else>
+        <SkusCard></SkusCard>
+      </template>
     </el-form>
   </FormDrawer>
 </template>
@@ -50,8 +52,11 @@
 <script setup>
 import { ref, reactive } from "vue";
 import FormDrawer from "~/components/FormDrawer.vue";
-import { setGoodsSkus, readGoods } from "~/api/goods";
+// 报错说需要把文件名首字母改为小写s，非常奇怪：文件名大写、引入时小写，我这样改居然就不报错了
+import SkusCard from "./components/skusCard.vue";
+import { updateGoodsSkus, readGoods } from "~/api/goods";
 import { toast } from "../../composables/util";
+import { goodsId, initSkusCardList } from "../../composables/useSkus.js";
 
 const form = reactive({
   sku_type: 0,
@@ -60,7 +65,6 @@ const form = reactive({
 const formDrawerRef = ref(null);
 
 // 点击按钮，先请求加载数据，再打开抽屉
-const goodsId = ref(0);
 const open = async (row) => {
   goodsId.value = row.id;
   row.skusLoading = true;
@@ -74,6 +78,7 @@ const open = async (row) => {
       weight: 0,
       volume: 0,
     };
+    initSkusCardList(res);
     formDrawerRef.value.open();
   } catch (err) {
     console.error("查看商品资料失败: ", err);
@@ -92,7 +97,7 @@ const emit = defineEmits(["reload"]);
 const handleSubmit = async () => {
   formDrawerRef.value.showLoading();
   try {
-    await setGoodsSkus(goodsId.value, form);
+    await updateGoodsSkus(goodsId.value, form);
     toast("设置商品规格成功");
     emit("reload");
     formDrawerRef.value.close();
