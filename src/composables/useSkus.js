@@ -4,6 +4,9 @@ import {
   updateGoodsSkusCard,
   deleteGoodsSkusCard,
   sortGoodsSkusCard,
+  createGoodsSkusCardValue,
+  updateGoodsSkusCardValue,
+  deleteGoodsSkusCardValue,
 } from "../api/goods";
 import { useArrayMoveUp, useArrayMoveDown } from "./util";
 
@@ -64,6 +67,7 @@ export async function updateSkusCard(item) {
     };
     await updateGoodsSkusCard(item.id, obj);
   } catch (err) {
+    item.text = item.name;
     console.error("修改规格选项失败：", err);
   } finally {
     item.loading = false;
@@ -110,29 +114,84 @@ export async function sortSkusCard(direction, index) {
 
 // 初始化规格值列表
 export function initSkusCardItem(skusCardId) {
+  // 获取对应规格选项下的规格值列表
+  const item = skus_card_list.value.find((obj) => obj.id === skusCardId);
+
   // 来自 element-plus 的可编辑 tag 组件配置
   const inputValue = ref("");
   const inputVisible = ref(false);
   const InputRef = ref();
-  const handleClose = (tag) => {
-    dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
+  const loading = ref(false);
+  // 配置: 用于删除选项值
+  const handleClose = async (tag) => {
+    loading.value = true;
+    try {
+      await deleteGoodsSkusCardValue(tag.id);
+      const index = item.goodsSkusCardValue.findIndex(
+        (obj) => obj.id === tag.id
+      );
+      if (index !== -1) {
+        item.goodsSkusCardValue.splice(index, 1);
+      }
+    } catch (err) {
+      console.error("删除规格选项值失败: ", err);
+    } finally {
+      loading.value = false;
+    }
   };
+  // 配置: 展示输入框，用于新增选项值
   const showInput = () => {
     inputVisible.value = true;
     nextTick(() => {
       InputRef.value.input.focus();
     });
   };
-  const handleInputConfirm = () => {
-    if (inputValue.value) {
-      dynamicTags.value.push(inputValue.value);
+  // 配置: 新增选项值
+  const handleInputConfirm = async () => {
+    if (!inputValue.value) {
+      inputVisible.value = false;
+      return;
     }
-    inputVisible.value = false;
-    inputValue.value = "";
+    loading.value = true;
+    try {
+      const res = await createGoodsSkusCardValue({
+        goods_skus_card_id: skusCardId,
+        name: item.name,
+        order: 50,
+        value: inputValue.value,
+      });
+      item.goodsSkusCardValue.push({
+        ...res,
+        text: res.value,
+      });
+    } catch (err) {
+      console.error("新增规格选项值失败: ", err);
+    } finally {
+      inputVisible.value = false;
+      inputValue.value = "";
+      loading.value = false;
+    }
   };
 
-  // 获取对应规格选项下的规格值列表
-  const item = skus_card_list.value.find((obj) => obj.id === skusCardId);
+  // 修改选项值
+  const handleChange = async (value, tag) => {
+    loading.value = true;
+    try {
+      await updateGoodsSkusCardValue(skusCardId, {
+        goods_skus_card_id: tag.id,
+        name: item.name, // 规格选项名
+        order: tag.order,
+        value, // 规格选项值
+      });
+      tag.value = value;
+    } catch (err) {
+      tag.text = tag.value;
+      console.error("修改选项值失败：", err);
+    } finally {
+      loading.value = true;
+    }
+  };
+
   return {
     inputValue,
     inputVisible,
@@ -140,6 +199,8 @@ export function initSkusCardItem(skusCardId) {
     handleClose,
     showInput,
     handleInputConfirm,
+    loading,
     item,
+    handleChange,
   };
 }

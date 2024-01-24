@@ -64,3 +64,18 @@ export function deleteGoodsSkusCard(id) {
 export function sortGoodsSkusCard(data) {
   return axios.post(`/admin/goods_skus_card/sort`, data);
 }
+
+// （多规格下）添加规格选项值
+export function createGoodsSkusCardValue(data) {
+  return axios.post(`/admin/goods_skus_card_value`, data);
+}
+
+// （多规格下）修改规格选项值
+export function updateGoodsSkusCardValue(id, data) {
+  return axios.post(`/admin/goods_skus_card_value/${id}`, data);
+}
+
+// （多规格下）删除规格选项值
+export function deleteGoodsSkusCardValue(id) {
+  return axios.post(`/admin/goods_skus_card_value/${id}/delete`);
+}

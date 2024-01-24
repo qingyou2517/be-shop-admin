@@ -92,6 +92,7 @@ const handleAddSkusCard = () => {
 
 // 修改规格选项
 const handleUpdateSkusCard = (item) => {
+  if (item.text === "") return;
   updateSkusCard(item);
 };
 
