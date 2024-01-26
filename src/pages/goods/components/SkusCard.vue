@@ -20,9 +20,10 @@
               <el-button
                 type="primary"
                 size="default"
-                @click=""
+                @click="handleChooseSkus(item)"
                 @mouseenter="tooltipVisible = true"
                 @mouseleave="tooltipVisible = false"
+                class="cursor-pointer"
               >
                 <el-icon><More /></el-icon>
               </el-button>
@@ -68,11 +69,14 @@
       >添加规格选项</el-button
     >
   </el-form-item>
+
+  <ChooseSkus ref="chooseSkusRef"></ChooseSkus>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import SkusCardItem from "./SkusCardItem.vue";
+import ChooseSkus from "~/components/ChooseSkus.vue";
 import {
   skus_card_list,
   btnLoading,
@@ -81,6 +85,7 @@ import {
   deleteSkusCard,
   sortSkusCard,
   bodyLoading,
+  chooseSetGoodsSkusCard,
 } from "~/composables/useSkus.js";
 
 const tooltipVisible = ref(false);
@@ -99,6 +104,18 @@ const handleUpdateSkusCard = (item) => {
 // 删除规格选项
 const handleDeleteSkusCard = (item) => {
   deleteSkusCard(item);
+};
+
+// 打开对话框，选择规格
+const chooseSkusRef = ref(null);
+const handleChooseSkus = (item) => {
+  chooseSkusRef.value.open((formValue) => {
+    const data = {
+      name: formValue.name,
+      value: formValue.list,
+    };
+    chooseSetGoodsSkusCard(item.id, data);
+  });
 };
 </script>
 

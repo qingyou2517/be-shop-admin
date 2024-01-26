@@ -175,4 +175,8 @@ async function handleDelete(id) {
   </FormDrawer>
 </template>
 
-<style scoped></style>
+<style scoped>
+.border-right {
+  border-right: 1px solid #eee;
+}
+</style>

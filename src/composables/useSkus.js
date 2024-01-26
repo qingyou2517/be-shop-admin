@@ -7,6 +7,7 @@ import {
   createGoodsSkusCardValue,
   updateGoodsSkusCardValue,
   deleteGoodsSkusCardValue,
+  chooseAndSetGoodsSkusCard,
 } from "../api/goods";
 import { useArrayMoveUp, useArrayMoveDown } from "./util";
 
@@ -109,6 +110,25 @@ export async function sortSkusCard(direction, index) {
     console.error("排序商品规格，同步到后端失败: ", err);
   } finally {
     bodyLoading.value = false;
+  }
+}
+
+// 选择后，设置规格选项和值
+export async function chooseSetGoodsSkusCard(id, data) {
+  let item = skus_card_list.value.find((obj) => obj.id === id);
+  item.loading = true;
+  try {
+    const res = await chooseAndSetGoodsSkusCard(id, data);
+    item.name = res.goods_skus_card.name;
+    item.text = res.goods_skus_card.name;
+    item.goodsSkusCardValue = res.goods_skus_card_value.map((obj) => {
+      obj.text = obj.value || "属性值";
+      return obj;
+    });
+  } catch (err) {
+    console.error("设置规格选项和值失败：", err);
+  } finally {
+    item.loading = false;
   }
 }
 

@@ -93,7 +93,7 @@ defineExpose({
 
 const emit = defineEmits(["reload"]);
 
-// 点击提交，设置商品详情
+// 点击提交，设置商品(单)规格
 const handleSubmit = async () => {
   formDrawerRef.value.showLoading();
   try {

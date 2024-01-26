@@ -40,7 +40,7 @@ export function setGoodsBanner(id, data) {
   return axios.post(`/admin/goods/banners/${id}`, data);
 }
 
-// 设置商品规格
+// 设置商品(单)规格
 export function updateGoodsSkus(id, data) {
   return axios.post(`/admin/goods/updateskus/${id}`, data);
 }
@@ -78,4 +78,9 @@ export function updateGoodsSkusCardValue(id, data) {
 // （多规格下）删除规格选项值
 export function deleteGoodsSkusCardValue(id) {
   return axios.post(`/admin/goods_skus_card_value/${id}/delete`);
+}
+
+// （多规格下）选择后，设置规格选项和值
+export function chooseAndSetGoodsSkusCard(id, data) {
+  return axios.post(`/admin/goods_skus_card/${id}/set`, data);
 }
