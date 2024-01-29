@@ -44,6 +44,7 @@
       <!-- 多规格 -->
       <template v-else>
         <SkusCard></SkusCard>
+        <SkusTable></SkusTable>
       </template>
     </el-form>
   </FormDrawer>
@@ -54,6 +55,7 @@ import { ref, reactive } from "vue";
 import FormDrawer from "~/components/FormDrawer.vue";
 // 报错说需要把文件名首字母改为小写s，非常奇怪：文件名大写、引入时小写，我这样改居然就不报错了
 import SkusCard from "./components/skusCard.vue";
+import SkusTable from "./components/SkusTable.vue";
 import { updateGoodsSkus, readGoods } from "~/api/goods";
 import { toast } from "../../composables/util";
 import { goodsId, initSkusCardList } from "../../composables/useSkus.js";

@@ -1,4 +1,4 @@
-import { nextTick, ref } from "vue";
+import { nextTick, ref, computed } from "vue";
 import {
   createGoodsSkusCard,
   updateGoodsSkusCard,
@@ -17,6 +17,9 @@ export const goodsId = ref(0);
 // 规格选项列表
 export const skus_card_list = ref([]);
 
+// 规格数据
+export const skus_list = ref([]);
+
 // 初始化规格选项列表
 export function initSkusCardList(data) {
   skus_card_list.value = data.goodsSkusCard.map((item) => {
@@ -28,6 +31,8 @@ export function initSkusCardList(data) {
     });
     return item;
   });
+
+  skus_list.value = data.goodsSkus;
 }
 
 // 添加规格选项
@@ -222,5 +227,27 @@ export function initSkusCardItem(skusCardId) {
     loading,
     item,
     handleChange,
+  };
+}
+
+// 初始化 "规格设置" 对应的表格
+export function initSkusTable() {
+  // 只展示有规格值的规格选项
+  const skus_labels = computed(() => {
+    return skus_card_list.value.filter(
+      (item) => item.goodsSkusCardValue.length > 0
+    );
+  });
+  skus_list.value = skus_list.value.map((skuObj) => {
+    let skus = skuObj.skus;
+    for (let key in skus) {
+      skuObj[`sku_value_${key}`] = skus[key].value;
+    }
+    return skuObj;
+  });
+
+  return {
+    skus_labels,
+    skus_list,
   };
 }
