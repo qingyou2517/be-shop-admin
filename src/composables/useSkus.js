@@ -9,7 +9,7 @@ import {
   deleteGoodsSkusCardValue,
   chooseAndSetGoodsSkusCard,
 } from "../api/goods";
-import { useArrayMoveUp, useArrayMoveDown } from "./util";
+import { useArrayMoveUp, useArrayMoveDown, perMutateAndCombine } from "./util";
 
 // 当前商品的 id
 export const goodsId = ref(0);
@@ -18,7 +18,8 @@ export const goodsId = ref(0);
 export const skus_card_list = ref([]);
 
 // 规格数据
-export const skus_list = ref([]);
+export const skus_list = ref([]); // 添加了自定义字段，用于配合el-table渲染
+export let skus_formData = ref([]); // 字段完全符合后端要求，用于提交给后端、更新规格
 
 // 初始化规格选项列表
 export function initSkusCardList(data) {
@@ -31,7 +32,6 @@ export function initSkusCardList(data) {
     });
     return item;
   });
-
   skus_list.value = data.goodsSkus;
 }
 
@@ -54,6 +54,7 @@ export async function addSkusCard() {
       loading: false,
       goodsSkusCardValue: [],
     });
+    getTableData();
   } catch (err) {
     console.error("新增规格选项失败：", err);
   } finally {
@@ -72,6 +73,7 @@ export async function updateSkusCard(item) {
       type: item.type,
     };
     await updateGoodsSkusCard(item.id, obj);
+    getTableData();
   } catch (err) {
     item.text = item.name;
     console.error("修改规格选项失败：", err);
@@ -89,6 +91,7 @@ export async function deleteSkusCard(item) {
     if (index !== -1) {
       skus_card_list.value.splice(index, 1);
     }
+    getTableData();
   } catch (err) {
     console.error("删除规格选项失败：", err);
   } finally {
@@ -111,6 +114,7 @@ export async function sortSkusCard(direction, index) {
   try {
     await sortGoodsSkusCard({ sortdata: sortData });
     func(skus_card_list.value, index);
+    getTableData();
   } catch (err) {
     console.error("排序商品规格，同步到后端失败: ", err);
   } finally {
@@ -130,6 +134,7 @@ export async function chooseSetGoodsSkusCard(id, data) {
       obj.text = obj.value || "属性值";
       return obj;
     });
+    getTableData();
   } catch (err) {
     console.error("设置规格选项和值失败：", err);
   } finally {
@@ -158,6 +163,7 @@ export function initSkusCardItem(skusCardId) {
       if (index !== -1) {
         item.goodsSkusCardValue.splice(index, 1);
       }
+      getTableData();
     } catch (err) {
       console.error("删除规格选项值失败: ", err);
     } finally {
@@ -189,6 +195,7 @@ export function initSkusCardItem(skusCardId) {
         ...res,
         text: res.value,
       });
+      getTableData();
     } catch (err) {
       console.error("新增规格选项值失败: ", err);
     } finally {
@@ -209,6 +216,7 @@ export function initSkusCardItem(skusCardId) {
         value, // 规格选项值
       });
       tag.value = value;
+      getTableData();
     } catch (err) {
       tag.text = tag.value;
       console.error("修改选项值失败：", err);
@@ -238,10 +246,29 @@ export function initSkusTable() {
       (item) => item.goodsSkusCardValue.length > 0
     );
   });
-  skus_list.value = skus_list.value.map((skuObj) => {
+
+  skus_formData.value = JSON.parse(JSON.stringify(skus_list.value));
+
+  skus_list.value = skus_list.value.map((skuObj, index) => {
     let skus = skuObj.skus;
-    for (let key in skus) {
-      skuObj[`sku_value_${key}`] = skus[key].value;
+    if (Object.prototype.toString(skus) === "[object Object]") {
+      for (let key in skus) {
+        // skus_list 每一项添加自定义字段
+        skuObj[`sku_value_${key}`] = skus[key].value;
+        // skus_formData 每一项删除那些自定义字段
+        if (skus_formData.value[index][`sku_value_${key}`]) {
+          delete skus_formData.value[index][`sku_value_${key}`];
+        }
+      }
+    } else if (Array.isArray(skus)) {
+      skus.forEach((item, i) => {
+        // skus_list 每一项添加自定义字段
+        skuObj[`sku_value_${i}`] = item.value;
+        // skus_formData 每一项删除那些自定义字段
+        if (skus_formData.value[index][`sku_value_${i}`]) {
+          delete skus_formData.value[index][`sku_value_${i}`];
+        }
+      });
     }
     return skuObj;
   });
@@ -249,5 +276,40 @@ export function initSkusTable() {
   return {
     skus_labels,
     skus_list,
+    skus_formData,
   };
+}
+
+export function getTableData() {
+  setTimeout(() => {
+    // 若没有设置规格选项
+    if (skus_card_list.value.length === 0) return [];
+    let list = [];
+    skus_card_list.value.forEach((obj) => {
+      if (obj.goodsSkusCardValue && obj.goodsSkusCardValue.length > 0) {
+        list.push(obj.goodsSkusCardValue); // 得到二维数组
+      }
+    });
+    // 若设置了规格选项，但是没有设置值
+    if (list.length === 0) return [];
+
+    let tableData = perMutateAndCombine(...list); // 二维数组
+
+    skus_list.value = [];
+    skus_list.value = tableData.map((arr) => {
+      return {
+        image: "",
+        pprice: "0.00",
+        oprice: "0.00",
+        cprice: "0.00",
+        stock: 0,
+        volume: 0,
+        weight: 0,
+        code: "",
+        goods_id: 28,
+        skus: arr,
+      };
+    });
+    initSkusTable();
+  }, 200);
 }

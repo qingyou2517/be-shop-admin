@@ -68,3 +68,21 @@ function swapArrayItem(arr, index1, index2) {
   // index1: 交换前的位置； index2: 交换后的位置
   arr[index1] = arr.splice(index2, 1, arr[index1])[0];
 }
+
+// 规格选项值：排列组合
+export function perMutateAndCombine() {
+  let arr = Array.from(arguments);
+
+  return arr.reduce(
+    (prev, current) => {
+      let newArr = [];
+      prev.forEach((item1) => {
+        current.forEach((item2) => {
+          newArr.push(item1.concat([item2]));
+        });
+      });
+      return newArr;
+    },
+    [[]]
+  );
+}

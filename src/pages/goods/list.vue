@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, reactive, watch, toRefs } from "vue";
 import {
   getGoodsList,
   updateGoodsStatus,
@@ -168,7 +168,9 @@ const handleSetSkus = (row) => {
 };
 // 是否设置了商品规格
 const hasSetSkus = (row) => {
-  if (!row.sku_value && row.goods_skus.length === 0) {
+  if (row.sku_type === 1 && row.goods_skus.length === 0) {
+    return false;
+  } else if (row.sku_type === 0 && !row.sku_value) {
     return false;
   } else {
     return true;

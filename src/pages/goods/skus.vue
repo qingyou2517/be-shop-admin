@@ -51,14 +51,19 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import FormDrawer from "~/components/FormDrawer.vue";
 // 报错说需要把文件名首字母改为小写s，非常奇怪：文件名大写、引入时小写，我这样改居然就不报错了
 import SkusCard from "./components/skusCard.vue";
 import SkusTable from "./components/SkusTable.vue";
 import { updateGoodsSkus, readGoods } from "~/api/goods";
 import { toast } from "../../composables/util";
-import { goodsId, initSkusCardList } from "../../composables/useSkus.js";
+import {
+  goodsId,
+  initSkusCardList,
+  skus_formData,
+  skus_list,
+} from "../../composables/useSkus.js";
 
 const form = reactive({
   sku_type: 0,
@@ -95,11 +100,18 @@ defineExpose({
 
 const emit = defineEmits(["reload"]);
 
-// 点击提交，设置商品(单)规格
+// 点击提交，设置商品(单/多)规格
 const handleSubmit = async () => {
   formDrawerRef.value.showLoading();
+  let data = {
+    sku_type: form.sku_type,
+    sku_value: form.sku_value,
+  };
+  if (form.sku_type === 1) {
+    data.goodsSkus = skus_formData.value;
+  }
   try {
-    await updateGoodsSkus(goodsId.value, form);
+    await updateGoodsSkus(goodsId.value, data);
     toast("设置商品规格成功");
     emit("reload");
     formDrawerRef.value.close();
@@ -109,6 +121,34 @@ const handleSubmit = async () => {
     formDrawerRef.value.hideLoading();
   }
 };
+
+// skus_list更新的时候，同步到 skus_formData，且 skus_formData 要删去那些自定义字段
+watch(
+  () => skus_list.value,
+  () => {
+    skus_formData.value = JSON.parse(JSON.stringify(skus_list.value));
+    skus_formData.value = skus_formData.value.map((skuObj) => {
+      let skus = skuObj.skus;
+      if (Object.prototype.toString(skus) === "[object Object]") {
+        for (let key in skus) {
+          // skus_formData 每一项删除那些自定义字段
+          if (skuObj[`sku_value_${key}`]) {
+            delete skuObj[`sku_value_${key}`];
+          }
+        }
+      } else if (Array.isArray(skus)) {
+        skus.forEach((item, i) => {
+          // skus_formData 每一项删除那些自定义字段
+          if (skuObj[`sku_value_${i}`]) {
+            delete skuObj[`sku_value_${i}`];
+          }
+        });
+      }
+      return skuObj;
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped></style>
