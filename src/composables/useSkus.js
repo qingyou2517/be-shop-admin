@@ -295,21 +295,63 @@ export function getTableData() {
 
     let tableData = perMutateAndCombine(...list); // 二维数组
 
+    // 获取之前的规格列表：skus 字段内按规格 id 排序后，抽离每项的规格值 id 组合成字符串、记录在 skusIds 字段
+    let beforeSkusList = JSON.parse(JSON.stringify(skus_list.value)).map(
+      (obj) => {
+        // skus字段可能是嵌套对象 =》把它转为对象数组
+        if (!Array.isArray(obj.skus)) {
+          obj.skus = Object.keys(obj.skus).map((key) => obj.skus[key]);
+        }
+        // skus 每一项按规格值 id 升序排序，然后取 id 存入 skusIds 字段
+        obj.skusIds = obj.skus
+          .sort((a, b) => a.id - b.id)
+          .map((o) => o.id)
+          .join(",");
+        return obj;
+      }
+    );
+
     skus_list.value = [];
-    skus_list.value = tableData.map((arr) => {
+    skus_list.value = tableData.map((skusArr) => {
+      const obj = getBeforeSkuItem(
+        JSON.parse(JSON.stringify(skusArr)),
+        beforeSkusList
+      );
       return {
-        image: "",
-        pprice: "0.00",
-        oprice: "0.00",
-        cprice: "0.00",
-        stock: 0,
-        volume: 0,
-        weight: 0,
-        code: "",
-        goods_id: 28,
-        skus: arr,
+        image: obj?.image || "",
+        pprice: obj?.pprice || "0.00",
+        oprice: obj?.oprice || "0.00",
+        cprice: obj?.cprice || "0.00",
+        stock: obj?.stock || 0,
+        volume: obj?.volume || 0,
+        weight: obj?.weight || 0,
+        code: obj?.code || "",
+        goods_id: obj?.goods_id || 28,
+        skus: skusArr,
       };
     });
     initSkusTable();
   }, 200);
+}
+
+function getBeforeSkuItem(newSkus, beforeSkusList) {
+  // newSkus 来自新数据的 skus 字段：可能是嵌套对象 =》把它转为对象数组
+  if (!Array.isArray(newSkus)) {
+    newSkus = Object.keys(newSkus).map((key) => newSkus[key]);
+  }
+  // 新的各项规格值按 id 排序后，组合成字符串
+  const newSkusIds = newSkus
+    .sort((a, b) => a.id - b.id)
+    .map((o) => o.id)
+    .join(",");
+
+  return beforeSkusList.find((o, index) => {
+    // 如果新数据的skus字段，比老数据的skus字段长
+    if (newSkus.length > o.skus.length) {
+      // 那么从新的 ids 字符串里，找到旧的 ids 字符串
+      return newSkusIds.indexOf(o.skusIds) !== -1;
+    }
+    // 反之，就从旧的 ids 字符串里，找到新的 ids 字符串
+    return o.skusIds.indexOf(newSkusIds) !== -1;
+  });
 }
