@@ -215,6 +215,7 @@ const hasSetSkus = (row) => {
               v-model="searchForm.category_id"
               value-key=""
               placeholder="请选择商品分类"
+              size="small"
               clearable
             >
               <el-option
