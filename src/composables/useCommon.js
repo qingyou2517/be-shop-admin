@@ -226,11 +226,13 @@ export function useInitForm(option = {}) {
         if (updateId.value !== 0) {
           await option.update(updateId.value, data);
           toast("修改成功");
-          option.getData(option.currentPage.value);
+          option.currentPage
+            ? option.getData(option.currentPage.value)
+            : option.getData();
         } else {
           await option.add(data);
           toast("新增成功");
-          option.getData(1);
+          option.currentPage ? option.getData(1) : option.getData();
         }
 
         formDrawerRef.value.close();

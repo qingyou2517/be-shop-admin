@@ -2,7 +2,6 @@
 import { ref, reactive } from "vue";
 import ListHeader from "~/components/ListHeader.vue";
 import FormDrawer from "~/components/FormDrawer.vue";
-import IconSelect from "~/components/IconSelect.vue";
 import {
   getCategoryList,
   updateCategory,
@@ -28,15 +27,7 @@ const { tableList, loading, getData, handleStatusChange, handleDelete } =
 const formOption = {
   // 注意要写成defaultForm，因为新增时传入resetForm的参数是option.defaultForm
   defaultForm: {
-    rule_id: 0,
-    menu: 0,
     name: "",
-    condition: "",
-    method: "GET",
-    status: 1,
-    order: 50,
-    icon: "",
-    frontpath: "",
   },
   rules: {
     rule_id: [
@@ -47,6 +38,7 @@ const formOption = {
       },
     ],
   },
+  getData,
   update: updateCategory,
   add: addCategory,
 };
@@ -121,68 +113,8 @@ const {
         label-width="100px"
         :inline="false"
       >
-        <el-form-item label="菜单/规则" prop="menu" class="flex items-center">
-          <el-radio-group v-model="form.menu">
-            <el-radio :label="1" size="default" border>菜单</el-radio>
-            <el-radio :label="0" size="default" border>规则</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input
-            v-model="form.name"
-            placeholder="请输入名称"
-            class="w-[30%]"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="后端规则" prop="condition" v-if="form.menu === 0">
-          <el-input
-            v-model="form.condition"
-            placeholder="请输入后端规则"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
-          label="请求方式"
-          prop="method"
-          v-if="form.menu === 0"
-          class="flex items-center"
-        >
-          <el-select
-            v-model="form.method"
-            class="m-2"
-            placeholder="请选择请求方式"
-          >
-            <el-option
-              v-for="item in ['GET', 'POST', 'PUT', 'DELETE']"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label="菜单图标"
-          prop="icon"
-          v-if="form.menu === 1"
-          class="flex items-center"
-        >
-          <el-icon v-if="form.icon" class="mr-2">
-            <component :is="form.icon"></component>
-          </el-icon>
-          <IconSelect v-model="form.icon"></IconSelect>
-        </el-form-item>
-        <el-form-item
-          label="前端路由"
-          prop="frontpath"
-          v-if="form.menu === 1 && form.rule_id > 0"
-        >
-          <el-input
-            v-model="form.frontpath"
-            placeholder="请输入前端路由"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="排序">
-          <el-input-number v-model="form.order" :min="0" :max="1000">
-          </el-input-number>
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入分类名称"></el-input>
         </el-form-item>
       </el-form>
     </FormDrawer>
