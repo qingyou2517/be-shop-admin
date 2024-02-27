@@ -37,7 +37,7 @@ const formOption = {
     rule_id: [
       {
         required: true,
-        message: "用户名不能为空",
+        message: "分类名不能为空",
         trigger: "blur", // 触发校验的时机是：失去焦点时
       },
     ],
