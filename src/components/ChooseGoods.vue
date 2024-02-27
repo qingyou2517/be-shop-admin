@@ -1,9 +1,15 @@
 <template>
-  <el-dialog title="选择商品" v-model="dialogVisible" width="80%" top="5vh">
+  <el-dialog
+    title="选择商品"
+    v-model="dialogVisible"
+    width="80%"
+    top="5vh"
+    destroy-on-close
+  >
     <el-table
       ref="multipleTableRef"
       :data="tableList"
-      style="width: 100%"
+      style="width: 100%; height: 60vh"
       stripe
       @selection-change="handleSelectionChange"
     >
@@ -66,12 +72,28 @@ import { toast } from "../composables/util";
 
 // 对话框
 const dialogVisible = ref(false);
-const open = () => {
+let callbackFunc = null;
+
+const open = (callback) => {
+  callbackFunc = callback;
   dialogVisible.value = true;
 };
+
 const close = () => {
   dialogVisible.value = false;
 };
+
+// 点击确认
+const handleSubmit = () => {
+  if (!hasSelect.value) {
+    return toast("请选择商品", "error");
+  }
+  if (typeof callbackFunc === "function") {
+    callbackFunc(ids.value);
+  }
+  close();
+};
+
 defineExpose({
   open,
   close,
@@ -95,14 +117,8 @@ const {
   handleSelectionChange,
   multipleTableRef,
   hasSelect,
+  ids,
 } = useInitTable(option);
-
-// 点击确认
-const handleSubmit = () => {
-  if (!hasSelect.value) {
-    return toast("请选择商品", "error");
-  }
-};
 </script>
 
 <style scoped></style>

@@ -191,6 +191,7 @@ export function useInitTable(option = {}) {
     handleDestroyGoods,
     handleMultiStatusChange,
     hasSelect,
+    ids,
   };
 }
 

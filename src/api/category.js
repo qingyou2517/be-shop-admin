@@ -29,6 +29,10 @@ export function getCategoryGoods(id) {
 
 // 删除当前分类下的某个关联产品
 export function deleteCategoryGood(id) {
-  console.log("id is: ", id);
   return axios.post(`/admin/app_category_item/${id}/delete`);
+}
+
+// 关联商品到当前分类
+export function connectCategoryGood(data) {
+  return axios.post(`/admin/app_category_item`, data);
 }

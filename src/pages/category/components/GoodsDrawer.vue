@@ -48,7 +48,11 @@
 import { ref, reactive } from "vue";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ChooseGoods from "~/components/ChooseGoods.vue";
-import { getCategoryGoods, deleteCategoryGood } from "~/api/category.js";
+import {
+  getCategoryGoods,
+  deleteCategoryGood,
+  connectCategoryGood,
+} from "~/api/category.js";
 import { toast } from "~/composables/util";
 
 // 表单抽屉组件
@@ -108,7 +112,23 @@ const handleDelete = async (row) => {
 const chooseGoodsRef = ref(null);
 
 const handleConnect = () => {
-  chooseGoodsRef.value.open();
+  chooseGoodsRef.value.open(async (goods_ids) => {
+    formDrawerRef.value.showLoading();
+    try {
+      await connectCategoryGood({
+        category_id: category_id.value,
+        goods_ids,
+      });
+      toast("成功关联商品");
+      await getTableData().catch((err) => {
+        console.error("获取商品列表失败：", err.response.data.msg);
+      });
+    } catch (err) {
+      console.error("关联所选商品失败：", err.response.data.msg);
+    } finally {
+      formDrawerRef.value.hideLoading();
+    }
+  });
 };
 </script>
 
