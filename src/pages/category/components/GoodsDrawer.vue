@@ -1,5 +1,10 @@
 <template>
-  <FormDrawer ref="formDrawerRef" title="推荐商品" @submit="handleSubmit">
+  <FormDrawer
+    ref="formDrawerRef"
+    title="推荐商品"
+    confirmText="关联"
+    @submit="handleConnect"
+  >
     <el-table :data="tableData" border stripe class="w-full">
       <el-table-column prop="goods_id" label="ID" width="100" />
       <el-table-column label="商品封面" width="180">
@@ -34,12 +39,15 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <ChooseGoods ref="chooseGoodsRef"></ChooseGoods>
   </FormDrawer>
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
 import FormDrawer from "~/components/FormDrawer.vue";
+import ChooseGoods from "~/components/ChooseGoods.vue";
 import { getCategoryGoods, deleteCategoryGood } from "~/api/category.js";
 import { toast } from "~/composables/util";
 
@@ -96,8 +104,12 @@ const handleDelete = async (row) => {
   }
 };
 
-// 表单提交
-const handleSubmit = () => {};
+// 关联商品
+const chooseGoodsRef = ref(null);
+
+const handleConnect = () => {
+  chooseGoodsRef.value.open();
+};
 </script>
 
 <style scoped></style>
