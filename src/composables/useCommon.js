@@ -106,6 +106,46 @@ export function useInitTable(option = {}) {
     }
   };
 
+  // 批量恢复回收站商品
+  const handleReStoreGoods = async () => {
+    if (ids.value.length <= 0) {
+      toast("需要先勾选操作对象", "error");
+      return;
+    }
+    loading.value = true;
+    try {
+      await option.restoreGoods(ids.value);
+      toast("成功恢复商品");
+      // 清空多选框的选中标记
+      if (multipleTableRef.value) {
+        multipleTableRef.value.clearSelection();
+      }
+      getData(1);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 彻底删除回收站商品
+  const handleDestroyGoods = async () => {
+    if (ids.value.length <= 0) {
+      toast("需要先勾选操作对象", "error");
+      return;
+    }
+    loading.value = true;
+    try {
+      await option.destroyGoods(ids.value);
+      toast("彻底删除成功");
+      // 清空多选框的选中标记
+      if (multipleTableRef.value) {
+        multipleTableRef.value.clearSelection();
+      }
+      getData(1);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // 批量修改状态：即批量上架、下架
   const handleMultiStatusChange = async (status) => {
     if (ids.value.length <= 0) {
@@ -147,6 +187,8 @@ export function useInitTable(option = {}) {
     handleSelectionChange,
     multipleTableRef,
     handleMultiDelete,
+    handleReStoreGoods,
+    handleDestroyGoods,
     handleMultiStatusChange,
     hasSelect,
   };

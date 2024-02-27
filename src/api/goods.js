@@ -30,6 +30,18 @@ export function deleteGoods(ids) {
   return axios.post("/admin/goods/delete_all", { ids });
 }
 
+// 批量恢复回收站的商品
+export function restoreGoods(ids) {
+  if (!Array.isArray(ids)) ids = [ids];
+  return axios.post("/admin/goods/restore", { ids });
+}
+
+// 彻底删除回收站的商品
+export function destroyGoods(ids) {
+  if (!Array.isArray(ids)) ids = [ids];
+  return axios.post("/admin/goods/destroy", { ids });
+}
+
 // 查看商品资料
 export function readGoods(id) {
   return axios.get(`/admin/goods/read/${id}`);

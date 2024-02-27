@@ -1,11 +1,13 @@
 <script setup>
-import { ref, reactive, watch, toRefs } from "vue";
+import { ref } from "vue";
 import {
   getGoodsList,
   updateGoodsStatus,
   addGood,
   updateGood,
   deleteGoods,
+  restoreGoods,
+  destroyGoods,
 } from "~/api/goods";
 import { getCategoryList } from "~/api/category";
 import FormDrawer from "~/components/FormDrawer.vue";
@@ -37,6 +39,8 @@ const option = {
   },
   updateStatus: updateGoodsStatus,
   delete: deleteGoods,
+  restoreGoods: restoreGoods,
+  destroyGoods: destroyGoods,
 };
 
 const {
@@ -52,6 +56,8 @@ const {
   handleSelectionChange,
   multipleTableRef,
   handleMultiDelete,
+  handleReStoreGoods,
+  handleDestroyGoods,
   handleMultiStatusChange,
   hasSelect,
 } = useInitTable(option);
@@ -224,11 +230,31 @@ const hasSetSkus = (row) => {
       </Search>
 
       <ListHeader
-        layout="create,delete,refresh"
+        layout="create,refresh"
         @create="handleAdd"
         @refresh="getData"
-        @delete="handleMultiDelete"
       >
+        <el-button
+          size="small"
+          type="danger"
+          @click="handleMultiDelete"
+          v-if="searchForm.tab !== 'delete'"
+          >批量删除</el-button
+        >
+        <el-button
+          size="small"
+          type="warning"
+          @click="handleReStoreGoods"
+          v-if="searchForm.tab === 'delete'"
+          >恢复商品</el-button
+        >
+        <el-button
+          size="small"
+          type="danger"
+          @click="handleDestroyGoods"
+          v-if="searchForm.tab === 'delete'"
+          >彻底删除</el-button
+        >
         <el-button
           size="small"
           @click="handleMultiStatusChange(1)"
