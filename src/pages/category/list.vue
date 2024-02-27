@@ -2,6 +2,7 @@
 import { ref, reactive } from "vue";
 import ListHeader from "~/components/ListHeader.vue";
 import FormDrawer from "~/components/FormDrawer.vue";
+import GoodsDrawer from "./components/GoodsDrawer.vue";
 import {
   getCategoryList,
   updateCategory,
@@ -15,7 +16,10 @@ import { useInitTable, useInitForm } from "~/composables/useCommon.js";
 const option = {
   getList: getCategoryList,
   getListSuccess: (res) => {
-    tableList.value = res;
+    tableList.value = res.map((o) => {
+      o.goodsDrawerLoading = false;
+      return o;
+    });
   },
   updateStatus: updateCategoryStatus,
   delete: deleteCategory,
@@ -52,6 +56,12 @@ const {
   handleAdd,
   handleEdit,
 } = useInitForm(formOption);
+
+// 点击"推荐商品"打开的表单抽屉
+const goodsDrawerRef = ref(null);
+const openGoodsDrawer = (data) => {
+  goodsDrawerRef.value.open(data);
+};
 </script>
 
 <template>
@@ -69,7 +79,12 @@ const {
 
           <div class="ml-auto items-center">
             <span @click.stop="">
-              <el-button text type="primary" size="small" @click.stop=""
+              <el-button
+                text
+                type="primary"
+                size="small"
+                :loading="data.goodsDrawerLoading"
+                @click.stop="openGoodsDrawer(data)"
                 >推荐商品</el-button
               >
               <el-switch
@@ -118,6 +133,8 @@ const {
         </el-form-item>
       </el-form>
     </FormDrawer>
+
+    <GoodsDrawer ref="goodsDrawerRef"></GoodsDrawer>
   </el-card>
 </template>
 
