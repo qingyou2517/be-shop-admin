@@ -52,6 +52,53 @@ const {
     </Search>
 
     <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
+      <el-table-column type="expand">
+        <template #default="{ row }">
+          <div class="flex pl-14">
+            <el-avatar
+              :size="50"
+              shape="circle"
+              :src="row.user.avatar"
+              fit="fill"
+            ></el-avatar>
+            <div class="flex-1 ml-2">
+              <h6 class="flex items-center">
+                <span>{{ row.user.nickname || row.user.username }}</span>
+                <small class="text-warm-gray-400 ml-2">{{
+                  row.review_time
+                }}</small>
+                <el-button size="small" class="ml-auto" @click=""
+                  >回复</el-button
+                >
+              </h6>
+              <p>{{ row.review.data }}</p>
+              <div class="py-2">
+                <el-image
+                  v-for="(src, index) in row.review.image"
+                  :key="index"
+                  :src="src"
+                  fit="cover"
+                  :lazy="true"
+                  class="w-[100px] h-[100px] rounded"
+                ></el-image>
+              </div>
+              <div
+                class="mt-2 bg-gray-100 p-3 rounded"
+                v-for="(item, index) in row.extra"
+                :key="index"
+              >
+                <div class="flex items-center">
+                  <h6 class="font-bold">客服</h6>
+                  <el-button type="info" size="small" class="ml-auto" @click=""
+                    >修改</el-button
+                  >
+                </div>
+                <p>{{ item.data }}</p>
+              </div>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="id" label="ID" width="100"></el-table-column>
       <el-table-column label="商品">
         <template #default="{ row }">

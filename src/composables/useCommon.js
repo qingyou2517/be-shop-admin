@@ -34,7 +34,6 @@ export function useInitTable(option = {}) {
 
     loading.value = true;
     try {
-      console.log("title: ", searchForm.title);
       let res = await option.getList(currentPage.value, searchForm);
       if (
         option.getListSuccess &&
