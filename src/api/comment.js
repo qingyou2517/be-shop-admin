@@ -6,8 +6,8 @@ export function getCommentList(page, query = { title: "" }) {
 }
 
 // 回复商品评价
-export function addComment(data) {
-  return axios.post(`/goods_comment/review/${id}`, data);
+export function reviewComment(id, data) {
+  return axios.post(`/admin/goods_comment/review/${id}`, { data });
 }
 
 // 修改评价状态

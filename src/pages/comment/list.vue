@@ -1,12 +1,15 @@
 <script setup>
 import { ref } from "vue";
-import { getCommentList, updateCommentStatus, addComment } from "~/api/comment";
-import FormDrawer from "~/components/FormDrawer.vue";
-import ChooseImage from "~/components/ChooseImage.vue";
-import ListHeader from "~/components/ListHeader.vue";
+import {
+  getCommentList,
+  updateCommentStatus,
+  reviewComment,
+} from "~/api/comment";
+
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
-import { useInitTable, useInitForm } from "../../composables/useCommon";
+import { useInitTable } from "../../composables/useCommon";
+import { toast } from "~/composables/util";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项
 const option = {
@@ -17,6 +20,7 @@ const option = {
   getListSuccess: (res) => {
     tableList.value = res.list.map((item) => {
       item.switchLoading = false;
+      item.textareaEdit = false;
       return item;
     });
     total.value = res.totalCount;
@@ -35,6 +39,29 @@ const {
   getData,
   handleStatusChange,
 } = useInitTable(option);
+
+// 客服回复的内容
+const textarea = ref("");
+// 打开客服回复框
+const openTextarea = (row, data = "") => {
+  textarea.value = data;
+  row.textareaEdit = true;
+};
+// 回复用户评价
+const review = async (row) => {
+  if (textarea.value === "") {
+    toast("回复内容不能为空", "error");
+    return;
+  }
+  try {
+    await reviewComment(row.id, textarea.value);
+    toast("回复成功");
+    row.textareaEdit = false;
+    getData();
+  } catch (err) {
+    console.error("回复用户评价失败：", err);
+  }
+};
 </script>
 
 <template>
@@ -51,7 +78,13 @@ const {
       </SearchItem>
     </Search>
 
-    <el-table :data="tableList" style="width: 100%" stripe v-loading="loading">
+    <el-table
+      :data="tableList"
+      style="width: 100%"
+      stripe
+      v-loading="loading"
+      default-expand-all
+    >
       <el-table-column type="expand">
         <template #default="{ row }">
           <div class="flex pl-14">
@@ -62,12 +95,18 @@ const {
               fit="fill"
             ></el-avatar>
             <div class="flex-1 ml-2">
+              <!-- 渲染用户评价 -->
               <h6 class="flex items-center">
                 <span>{{ row.user.nickname || row.user.username }}</span>
                 <small class="text-warm-gray-400 ml-2">{{
                   row.review_time
                 }}</small>
-                <el-button size="small" class="ml-auto" @click=""
+                <!-- 若客服还未回复，那么在这里渲染一个 "回复" 按钮 -->
+                <el-button
+                  size="small"
+                  class="ml-auto"
+                  @click="openTextarea(row)"
+                  v-if="!row.textareaEdit && !row.extra"
                   >回复</el-button
                 >
               </h6>
@@ -82,14 +121,37 @@ const {
                   class="w-[100px] h-[100px] rounded"
                 ></el-image>
               </div>
+              <!-- 客服的回复框 -->
+              <div v-if="row.textareaEdit">
+                <el-input
+                  v-model="textarea"
+                  placeholder="请输入回复内容"
+                  clearable
+                  type="textarea"
+                  @change=""
+                ></el-input>
+                <div class="py-2">
+                  <el-button type="primary" size="small" @click="review(row)"
+                    >回复</el-button
+                  ><el-button size="small" @click="row.textareaEdit = false"
+                    >取消</el-button
+                  >
+                </div>
+              </div>
+              <!-- 若客服已回复，则通过这里修改 -->
               <div
                 class="mt-2 bg-gray-100 p-3 rounded"
                 v-for="(item, index) in row.extra"
                 :key="index"
+                v-else
               >
                 <div class="flex items-center">
                   <h6 class="font-bold">客服</h6>
-                  <el-button type="info" size="small" class="ml-auto" @click=""
+                  <el-button
+                    type="info"
+                    size="small"
+                    class="ml-auto"
+                    @click="openTextarea(row, item.data)"
                     >修改</el-button
                   >
                 </div>
