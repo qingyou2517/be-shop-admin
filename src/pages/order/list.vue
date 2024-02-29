@@ -14,7 +14,8 @@ import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
-import ExportExcel from "./components/ExportExcel.vue";
+import ExportExcel from "./components/exportExcel.vue";
+import InfoModal from "./components/InfoModal.vue";
 import { useInitTable } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、为按钮添加 loading
@@ -96,6 +97,14 @@ const orderDrawerRef = ref(null);
 const exportExcelRef = ref(null);
 const handleDownload = () => {
   exportExcelRef.value.open();
+};
+
+// 查看订单详情
+const info = ref(null);
+const infoModalRef = ref(null);
+const openInfoModal = (row) => {
+  infoModalRef.value.open();
+  info.value = row;
 };
 </script>
 
@@ -184,7 +193,7 @@ const handleDownload = () => {
             <div class="flex">
               <div class="flex-1">
                 <p>订单编号：</p>
-                <small>{{ row.payment_no }}</small>
+                <small>{{ row.no }}</small>
               </div>
               <div>
                 <p>下单时间：</p>
@@ -255,9 +264,14 @@ const handleDownload = () => {
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="250">
-          <template #default="scope">
+          <template #default="{ row }">
             <div>
-              <el-button type="primary" text size="small" @click="">
+              <el-button
+                type="primary"
+                text
+                size="small"
+                @click="openInfoModal(row)"
+              >
                 订单详情
               </el-button>
               <el-button
@@ -307,6 +321,8 @@ const handleDownload = () => {
       </FormDrawer>
 
       <ExportExcel ref="exportExcelRef" :typesList="tabBars"></ExportExcel>
+
+      <InfoModal ref="infoModalRef" :info="info"></InfoModal>
     </el-card>
   </div>
 </template>
