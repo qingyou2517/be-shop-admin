@@ -118,22 +118,39 @@ const orderDrawerRef = ref(null);
 
         <!-- 高级搜索：调用<Search>组件的具名插槽 -->
         <template #showAdvanced>
-          <SearchItem label="商品分类">
-            <el-select
-              v-model="searchForm.category_id"
-              value-key=""
-              placeholder="请选择商品分类"
-              size="small"
+          <SearchItem label="收货人">
+            <el-input
+              v-model="searchForm.name"
+              placeholder="收货人"
               clearable
-            >
-              <el-option
-                v-for="item in categoryList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
+              size="small"
+            ></el-input>
+          </SearchItem>
+          <SearchItem label="手机号">
+            <el-input
+              v-model="searchForm.phone"
+              placeholder="手机号"
+              clearable
+              size="small"
+            ></el-input>
+          </SearchItem>
+          <SearchItem label="开始时间">
+            <el-date-picker
+              v-model="searchForm.starttime"
+              type="date"
+              placeholder="选择开始日期"
+              value-format="YYYY-MM-DD"
+              size="small"
+            />
+          </SearchItem>
+          <SearchItem label="结束日期">
+            <el-date-picker
+              v-model="searchForm.endtime"
+              type="date"
+              placeholder="选择结束日期"
+              value-format="YYYY-MM-DD"
+              size="small"
+            />
           </SearchItem>
         </template>
       </Search>
