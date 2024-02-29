@@ -152,60 +152,110 @@ const orderDrawerRef = ref(null);
         <el-table-column label="商品">
           <template #default="{ row }">
             <div class="flex">
-              <el-image
-                :src="row.cover"
-                fit="cover"
-                class="w-[50px] h-[50px] mr-3 rounded"
-              ></el-image>
               <div class="flex-1">
-                <p>{{ row.title }}</p>
-                <div>
-                  <span class="text-rose-500">¥{{ row.min_price }}</span>
-                  <el-divider direction="vertical"></el-divider>
-                  <span class="text-gray-500 text-xs"
-                    >¥{{ row.min_oprice }}</span
-                  >
-                </div>
-                <p class="text-gray-400 text-xs mb-1">
-                  分类：{{ row.category ? row.category.name : "未分类" }}
-                </p>
-                <p class="text-gray-400 text-xs mb-1">
-                  创建时间：{{ row.create_time }}
-                </p>
+                <p>订单编号：</p>
+                <small>{{ row.payment_no }}</small>
+              </div>
+              <div>
+                <p>下单时间：</p>
+                <small>{{ row.update_time }}</small>
+              </div>
+            </div>
+            <div
+              v-for="item in row.order_items"
+              :key="item.id"
+              class="flex items-center mt-2"
+            >
+              <el-image
+                :src="item.goods_item ? item.goods_item.cover : ''"
+                fit="cover"
+                :lazy="true"
+                class="w-[30px] h-[30px] rounded"
+              ></el-image>
+              <div class="flex-1 text-blue-500 ml-2">
+                {{ item.goods_item ? item.goods_item.title : "该商品已被删除" }}
               </div>
             </div>
           </template>
         </el-table-column>
         <el-table-column
           label="实际付款"
-          prop="sale_count"
+          prop="total_price"
           width="100"
           align="center"
         />
-        <el-table-column
-          label="买家"
-          prop="sale_count"
-          width="150"
-          align="center"
-        />
-        <el-table-column
-          prop="status"
-          label="交易状态"
-          width="250"
-          align="center"
-        >
+        <el-table-column label="买家" width="200" align="center">
           <template #default="{ row }">
-            <el-tag class="ml-2" type="success" v-if="row.status === 1"
-              >上架</el-tag
-            >
-            <el-tag class="ml-2" type="danger" v-else>仓库</el-tag>
+            <div>{{ row.user.nickname || row.user.username }}</div>
+            <small>(用户ID：{{ row.user.id }})</small>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200">
+        <el-table-column label="交易状态" width="250" align="center">
+          <template #default="{ row }">
+            <div class="flex flex-col items-center">
+              <div>付款状态：</div>
+              <div class="mt-1">
+                <el-tag v-if="row.payment_method === 'wechat'" type="success"
+                  >微信支付</el-tag
+                >
+                <el-tag v-if="row.payment_method === 'alipay'"
+                  >支付宝支付</el-tag
+                >
+                <el-tag v-else type="info" v-if="row.status === 1"
+                  >未支付</el-tag
+                >
+              </div>
+              <div class="flex items-center">
+                <div>发货状态：</div>
+                <div class="mt-1">
+                  <el-tag v-if="row.ship_data" type="success">已发货</el-tag>
+                  <el-tag v-else type="info">未发货</el-tag>
+                </div>
+              </div>
+              <div class="flex items-center">
+                <div>收货状态：</div>
+                <div class="mt-1">
+                  <el-tag v-if="row.ship_status === 'received'" type="success"
+                    >已收货</el-tag
+                  >
+                  <el-tag v-else type="info">未收货</el-tag>
+                </div>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="250">
           <template #default="scope">
             <div>
               <el-button type="primary" text size="small" @click="">
                 订单详情
+              </el-button>
+              <el-button
+                v-if="searchForm.tab === 'noship'"
+                type="primary"
+                text
+                size="small"
+                @click=""
+              >
+                订单发货
+              </el-button>
+              <el-button
+                v-if="searchForm.tab === 'refunding'"
+                type="primary"
+                text
+                size="small"
+                @click=""
+              >
+                同意退款
+              </el-button>
+              <el-button
+                v-if="searchForm.tab === 'refunding'"
+                type="primary"
+                text
+                size="small"
+                @click=""
+              >
+                拒绝退款
               </el-button>
             </div>
           </template>
