@@ -14,6 +14,7 @@ import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
+import ExportExcel from "./components/ExportExcel.vue";
 import { useInitTable } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、为按钮添加 loading
@@ -90,6 +91,12 @@ getCategoryList().then((res) => (categoryList.value = res));
 
 // 订单详情：抽屉
 const orderDrawerRef = ref(null);
+
+// 导出excel数据
+const exportExcelRef = ref(null);
+const handleDownload = () => {
+  exportExcelRef.value.open();
+};
 </script>
 
 <template>
@@ -155,7 +162,13 @@ const orderDrawerRef = ref(null);
         </template>
       </Search>
 
-      <ListHeader layout="delete" @delete="handleMultiDelete"></ListHeader>
+      <ListHeader
+        layout="delete,refresh,download"
+        @delete="handleMultiDelete"
+        @refresh="getData"
+        @download="handleDownload"
+      >
+      </ListHeader>
 
       <el-table
         ref="multipleTableRef"
@@ -292,6 +305,8 @@ const orderDrawerRef = ref(null);
 
       <FormDrawer ref="orderDrawerRef" title="订单详情" :destroyOnClose="true">
       </FormDrawer>
+
+      <ExportExcel ref="exportExcelRef" :typesList="tabBars"></ExportExcel>
     </el-card>
   </div>
 </template>

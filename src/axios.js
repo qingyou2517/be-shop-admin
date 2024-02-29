@@ -29,7 +29,9 @@ service.interceptors.response.use(
   function (response) {
     // 2xx 范围内的状态码都会触发该函数。
     // 处理响应数据的结构
-    return response.data.data;
+    return response.request.responseType === "blob"
+      ? response.data
+      : response.data.data;
   },
   function (error) {
     // 处理响应的错误信息

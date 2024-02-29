@@ -36,10 +36,16 @@ export function handleRefund(id, data) {
 
 // 导出订单
 export function exportOrder(
-  id,
   query = { tab: "all", starttime: "", endtime: "" }
 ) {
-  return axios.post(`/admin/order/${id}/excelexport`, { params: query });
+  let r = queryParams(query);
+  return axios.post(
+    `/admin/order/excelexport${r}`,
+    {},
+    {
+      responseType: "blob",
+    }
+  );
 }
 
 // 获取快递公司列表
