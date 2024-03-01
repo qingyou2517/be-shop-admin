@@ -2,7 +2,7 @@
   <el-drawer
     v-model="drawerVisible"
     title="订单详情"
-    size="40%"
+    size="50%"
     destroy-on-close
   >
     <el-card shadow="never" class="mb-4">
@@ -28,9 +28,18 @@
         <el-form-item label="物流公司">{{
           info.ship_data.express_company
         }}</el-form-item>
-        <el-form-item label="运单号">{{
-          info.ship_data.express_no
-        }}</el-form-item>
+        <el-form-item label="运单号">
+          {{ info.ship_data.express_no }}
+          <el-button
+            type="primary"
+            size="small"
+            text
+            class="ml-3"
+            :loading="loading"
+            @click="openShipInfoModal(info.id)"
+            >查看物流</el-button
+          >
+        </el-form-item>
         <el-form-item label="发货时间">{{ ship_time }}</el-form-item>
       </el-form>
     </el-card>
@@ -102,7 +111,7 @@
       <template #header>
         <div class="flex items-center">
           <span class="font-bold text-sm">退款信息</span>
-          <el-button type="text" size="default" disabled class="ml-auto">{{
+          <el-button text size="default" disabled class="ml-auto">{{
             refund_status
           }}</el-button>
         </div>
@@ -114,11 +123,14 @@
       </el-form>
     </el-card>
   </el-drawer>
+
+  <ShipInfoModal ref="shipInfoModalRef"></ShipInfoModal>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import { useDateFormat } from "@vueuse/core";
+import ShipInfoModal from "./ShipInfoModal.vue";
 
 const props = defineProps({
   info: {
@@ -163,7 +175,7 @@ const receivedAddress = computed(() => {
   return address.province + address.city + address.district + address.address;
 });
 
-// 抽屉组件
+// 抽屉组件: 订单详情
 const drawerVisible = ref(false);
 
 const open = () => {
@@ -176,6 +188,19 @@ defineExpose({
   open,
   close,
 });
+
+// 物流信息抽屉
+const shipInfoModalRef = ref(null);
+const loading = ref(false);
+const openShipInfoModal = async (id) => {
+  try {
+    loading.value = true;
+    await shipInfoModalRef.value.open(id);
+  } catch (err) {
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style scoped>
