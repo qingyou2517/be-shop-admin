@@ -10,6 +10,4 @@ export function setSysconfig(data) {
 }
 
 // 上传文件
-export function uploadFile(data) {
-  return axios.post("/admin/sysconfig/upload", data);
-}
+export const uploadAction = "/admin/sysconfig/upload";

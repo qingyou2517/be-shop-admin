@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive } from "vue";
-import { getSysconfigList, setSysconfig, uploadFile } from "~/api/sysconfig";
+import { getSysconfigList, setSysconfig } from "~/api/sysconfig";
 import { toast } from "~/composables/util";
 
 // 展示
