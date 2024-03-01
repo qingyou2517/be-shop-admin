@@ -7,16 +7,16 @@ import {
   handleRefund,
   exportOrder,
   getExpressCompanyList,
-  getShipInfo,
 } from "~/api/order";
 import { getCategoryList } from "~/api/category";
 import FormDrawer from "~/components/FormDrawer.vue";
 import ListHeader from "~/components/ListHeader.vue";
 import Search from "../../components/Search.vue";
 import SearchItem from "../../components/SearchItem.vue";
-import ExportExcel from "./components/exportExcel.vue";
+import ExportExcel from "./components/ExportExcel.vue";
 import InfoModal from "./components/InfoModal.vue";
 import { useInitTable } from "../../composables/useCommon";
+import { showModal, showPrompt, toast } from "~/composables/util";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项、批量删除、为按钮添加 loading
 const option = {
@@ -105,6 +105,27 @@ const infoModalRef = ref(null);
 const openInfoModal = (row) => {
   infoModalRef.value.open();
   info.value = row;
+};
+
+// 同意/拒绝退款
+const handleShipRefund = async (id, agree) => {
+  // agree 为 1 表同意，为 0 表拒绝
+  try {
+    if (agree) {
+      await handleRefund(id, { agree });
+      showModal("是否要同意该订单退款?")
+        .then((res) => {
+          return toast("已同意退款申请");
+        })
+        .catch((err) => {});
+    } else {
+      let reason = await showPrompt("请输入拒绝的理由");
+      await handleRefund(id, { agree, disagree_reason: reason });
+    }
+    getData();
+  } catch (err) {
+    console.error(err);
+  }
 };
 </script>
 
@@ -288,7 +309,7 @@ const openInfoModal = (row) => {
                 type="primary"
                 text
                 size="small"
-                @click=""
+                @click="handleShipRefund(row.id, 1)"
               >
                 同意退款
               </el-button>
@@ -297,7 +318,7 @@ const openInfoModal = (row) => {
                 type="primary"
                 text
                 size="small"
-                @click=""
+                @click="handleShipRefund(row.id, 0)"
               >
                 拒绝退款
               </el-button>
