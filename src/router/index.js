@@ -20,6 +20,7 @@ import SkusList from "~/pages/skus/list.vue";
 import LevelList from "~/pages/level/list.vue";
 import SettingBuy from "~/pages/setting/buy.vue";
 import SettingShip from "~/pages/setting/ship.vue";
+import DistributionIndex from "~/pages/distribution/index.vue";
 
 // 默认路由，所有用户共享
 const routes = [
@@ -183,6 +184,14 @@ const dynamicRoutes = [
     component: CouponList,
     meta: {
       title: "优惠券管理",
+    },
+  },
+  {
+    path: "/distribution/index",
+    name: "/distribution/index",
+    component: DistributionIndex,
+    meta: {
+      title: "分销员管理",
     },
   },
 ];
