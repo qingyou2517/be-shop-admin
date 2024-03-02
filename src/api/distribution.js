@@ -1,5 +1,6 @@
 // 拿到自定义的 axios 实例
 import axios from "~/axios";
+import { queryParams } from "~/composables/util";
 
 // 分销数据统计
 export function getAgentStatistics() {
@@ -7,18 +8,9 @@ export function getAgentStatistics() {
 }
 
 // 分销推广员列表
-export function getAgentList(
-  page,
-  query = {
-    keyword: "",
-    type: "all",
-    starttime: "",
-    endtime: "",
-    level: 0,
-    user_id: null,
-  }
-) {
-  return axios.get(`/admin/agent/${page}`, { params: query });
+export function getAgentList(page, query = {}) {
+  let r = queryParams(query);
+  return axios.get(`/admin/agent/${page}${r}`);
 }
 
 // 推广订单列表
