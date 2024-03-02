@@ -1,170 +1,143 @@
 <script setup>
 import { ref, reactive } from "vue";
-import { getSysconfigList, setSysconfig } from "~/api/sysconfig";
-import { toast } from "~/composables/util";
+import {
+  getDistributionSetting,
+  setDistributionSetting,
+} from "~/api/distribution";
+import ChooseImage from "~/components/ChooseImage.vue";
+import { toast } from "../../composables/util";
 
-// 展示
 const form = reactive({
-  open_reg: 1, // 开启注册，0关闭1开启
-  reg_method: "username", // 注册方式，username普通phone手机
-  password_min: 7, // 密码最小长度
-  password_encrypt: ["0", "1", "2"], // 密码复杂度，"0" 数字、"1" 小写字母、"2" 大写字母、"3" 符号；后端要求如 "0,1,2" 格式
-  upload_method: "oss", // 上传方式，local本地，oss对象存储
-  upload_config: {
-    Bucket: "",
-    ACCESS_KEY: "",
-    SECRET_KEY: "",
-    http: "",
-  }, // 上传配置：对象类型
-  api_safe: 1, // api安全，0关闭1开启
-  api_secret: "", // 秘钥
-  close_order_minute: null, // 未支付订单自动关闭时间：分钟，0不自动关闭
-  auto_received_day: null, // 已发货订单自动确认时间：天，0不自动收货
-  after_sale_day: null, // 已完成订单允许申请售后：天
-  alipay: null, // 支付宝支付配置：对象类型
-  wxpay: null, // 微信支付配置
+  distribution_open: 1, //分销启用:0禁用1启用
+  store_first_rebate: 10, //一级返佣比例：0~100
+  store_second_rebate: 20, //二级返佣比例：0~100
+  spread_banners: [
+    "http://tangzhe123-com.oss-cn-shenzhen.aliyuncs.com/public/62710076cd93e.png",
+  ], //分销海报图
+  is_self_brokerage: 1, //自购返佣:0否1是
+  settlement_days: 7, //结算时间（单位：天）
+  brokerage_method: "hand", //佣金到账方式:hand手动,wx微信
 });
-const activeName = ref("first");
 
-// 获取数据
 const loading = ref(false);
-const getData = async () => {
+function getData() {
   loading.value = true;
-  try {
-    let res = await getSysconfigList();
-    for (const key in form) {
-      form[key] = res[key];
-      form.password_encrypt = res.password_encrypt.split(",");
-    }
-  } catch (err) {
-    console.error("获取系统设置失败：", err);
-  } finally {
-    loading.value = false;
-  }
-};
+  getDistributionSetting()
+    .then((res) => {
+      for (const k in form) {
+        form[k] = res[k];
+      }
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
 getData();
 
-// 保存设置
-const handleSave = async () => {
+const submit = () => {
   loading.value = true;
-  try {
-    await setSysconfig({
-      ...form,
-      password_encrypt: form.password_encrypt.join(","),
+  setDistributionSetting({
+    ...form,
+  })
+    .then((res) => {
+      toast("修改成功");
+      getData();
+    })
+    .finally(() => {
+      loading.value = false;
     });
-  } catch (err) {
-    console.error("保存基本设置失败：", err);
-  } finally {
-    loading.value = false;
-  }
 };
 </script>
 
 <template>
-  <div v-loading="loading" class="bg-light-50 rounded p-4">
-    <el-form :model="form" label-width="150px">
-      <el-tabs v-model="activeName">
-        <el-tab-pane label="注册与访问" name="first">
-          <el-form-item label="是否允许注册会员">
-            <el-radio-group v-model="form.open_reg">
-              <el-radio :label="0" border>关闭</el-radio>
-              <el-radio :label="1" border>开启</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="注册类型">
-            <el-radio-group v-model="form.reg_method">
-              <el-radio label="username" border>普通注册</el-radio>
-              <el-radio label="phone" border>手机注册</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="密码最小长度">
-            <el-input
-              v-model="form.password_min"
-              placeholder="输入数字"
-              style="width: 360px"
-              type="number"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="强制密码复杂度">
-            <el-checkbox-group v-model="form.password_encrypt">
-              <el-checkbox label="0" border>数字</el-checkbox>
-              <el-checkbox label="1" border>小写字母</el-checkbox>
-              <el-checkbox label="2" border>大写字母</el-checkbox>
-              <el-checkbox label="3" border>符号</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
-        </el-tab-pane>
-
-        <el-tab-pane label="上传设置" name="second">
-          <el-form-item label="默认上传方式">
-            <el-radio-group v-model="form.upload_method">
-              <el-radio label="oss" border>对象存储</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="Bucket">
-            <el-input
-              v-model="form.upload_config.Bucket"
-              clearable
-              placeholder="Bucket"
-              style="width: 360px"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="ACCESS_KEY">
-            <el-input
-              v-model="form.upload_config.ACCESS_KEY"
-              placeholder="ACCESS_KEY"
-              type="password"
-              style="width: 360px"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="SECRET_KEY">
-            <el-input
-              v-model="form.upload_config.SECRET_KEY"
-              placeholder="SECRET_KEY"
-              type="password"
-              style="width: 360px"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="空间域名">
-            <el-input
-              v-model="form.upload_config.http"
-              placeholder="空间域名"
-              style="width: 360px"
-              clearable
-            ></el-input>
-            <small class="ml-1 text-gray-400">请补全 http:// 或 https://</small>
-          </el-form-item>
-        </el-tab-pane>
-
-        <el-tab-pane label="Api安全" name="third">
-          <el-form-item label="是否开启API安全">
-            <el-radio-group v-model="form.api_safe">
-              <el-radio :label="0" border>关闭</el-radio>
-              <el-radio :label="1" border>开启</el-radio>
-            </el-radio-group>
-            <small class="ml-1 text-gray-400"
-              >api 安全功能开启之后，调用前端 api 需要传输签名串</small
-            >
-          </el-form-item>
-          <el-form-item label="秘钥">
-            <el-input
-              v-model="form.api_secret"
-              placeholder="请输入秘钥"
-              clearable
-              style="width: 360px"
-            ></el-input>
-            <small class="ml-1 text-gray-400"
-              >秘钥设置关系系统中 api 调用传输签名串的编码规则，以及会员 token
-              解析。请慎重设置，注意设置之后对应会员要求重新登录获取
-              token</small
-            >
-          </el-form-item>
-        </el-tab-pane>
-      </el-tabs>
-      <el-form-item
-        ><el-button type="primary" @click="handleSave">保存</el-button>
+  <div v-loading="loading" class="bg-white p-4 rounded">
+    <el-form :model="form" label-width="160px">
+      <h5 class="bg-gray-100 p-3 rounded mb-5">基础设置</h5>
+      <el-form-item label="分销启用">
+        <el-radio-group v-model="form.distribution_open">
+          <el-radio :label="0" border> 禁用 </el-radio>
+          <el-radio :label="1" border> 开启 </el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="分销海报图">
+        <ChooseImage :limit="9" v-model="form.spread_banners" />
+      </el-form-item>
+      <h5 class="bg-gray-100 p-3 rounded mb-5">返佣设置</h5>
+      <el-form-item label="一级返佣比例">
+        <div>
+          <el-input
+            v-model="form.store_first_rebate"
+            placeholder="一级返佣比例"
+            style="width: 50%"
+            type="number"
+          >
+            <template #append>%</template>
+          </el-input>
+          <small class="text-gray-500 flex mt-1"
+            >订单交易成功后给上级返佣的比例0 - 100,例:5 = 反订单金额的5%</small
+          >
+        </div>
+      </el-form-item>
+      <el-form-item label="二级返佣比例">
+        <div>
+          <el-input
+            v-model="form.store_second_rebate"
+            placeholder="一级返佣比例"
+            style="width: 50%"
+            type="number"
+          >
+            <template #append>%</template>
+          </el-input>
+          <small class="text-gray-500 flex mt-1"
+            >订单交易成功后给上级返佣的比例0 - 100,例:5 = 反订单金额的5%</small
+          >
+        </div>
+      </el-form-item>
+      <el-form-item label="自购返佣">
+        <div>
+          <el-radio-group v-model="form.is_self_brokerage">
+            <el-radio :label="1" border> 是 </el-radio>
+            <el-radio :label="0" border> 否 </el-radio>
+          </el-radio-group>
+          <small class="text-gray-500 flex mt-1"
+            >是否开启自购返佣（开启：分销员自己购买商品，享受一级返佣，上级享受二级返佣；
+            关闭：分销员自己购买商品没有返佣）</small
+          >
+        </div>
+      </el-form-item>
+      <h5 class="bg-gray-100 p-3 rounded mb-5">结算设置</h5>
+      <el-form-item label="结算时间">
+        <div>
+          <el-input
+            v-model="form.settlement_days"
+            placeholder="结算时间"
+            style="width: 80%"
+            type="number"
+          >
+            <template #prepend>订单完成后</template>
+            <template #append>天</template>
+          </el-input>
+          <small class="text-gray-500 flex mt-1"
+            >预估佣金结算后无法进行回收，请谨慎设置结算天数</small
+          >
+        </div>
+      </el-form-item>
+      <el-form-item label="佣金到账方式">
+        <div>
+          <el-radio-group v-model="form.brokerage_method">
+            <el-radio label="hand" border> 手动到账 </el-radio>
+            <el-radio label="wx" border> 自动到微信零钱 </el-radio>
+          </el-radio-group>
+          <small class="text-gray-500 flex mt-1"
+            >佣金到账方式支持线下转账和微信零钱自动转账，手动转账更安全，自动转账更方便</small
+          >
+        </div>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" size="default" @click="submit"
+          >保存</el-button
+        >
       </el-form-item>
     </el-form>
   </div>

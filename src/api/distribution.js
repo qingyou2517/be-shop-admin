@@ -20,7 +20,7 @@ export function getAgentOrderList(page, query = {}) {
 }
 
 // 修改分销配置
-export function updateDistributionSetting(data) {
+export function setDistributionSetting(data) {
   return axios.post("/admin/distribution_setting/set", data);
 }
 
