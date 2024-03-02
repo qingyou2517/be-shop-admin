@@ -163,12 +163,12 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import { getAgentList } from "~/api/distribution";
 import Panel from "./components/Panel.vue";
 import Search from "../../components/search.vue";
 import SearchItem from "../../components/SearchItem.vue";
-import dataDrawer from "./components/DataDrawer.vue";
+import DataDrawer from "./components/DataDrawer.vue";
 import { useInitTable } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项
