@@ -82,9 +82,13 @@ const submitImage = () => {
       }
     }
   }
-  if (urlArr && !props.preview) {
-    callbackFunction(urlArr);
+
+  if (urlArr && props.preview) {
     emit("update:modelValue", urlArr);
+  }
+
+  if (!props.preview && typeof callbackFunction === "function") {
+    callbackFunction(urlArr);
   }
   close();
 };
