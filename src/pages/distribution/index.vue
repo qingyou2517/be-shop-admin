@@ -125,10 +125,20 @@
 
         <el-table-column fixed="right" label="操作" width="200" align="center">
           <template #default="{ row }">
-            <el-button type="primary" text size="small" @click="">
+            <el-button
+              type="primary"
+              text
+              size="small"
+              @click="openDataDrawer(row.id, 'user')"
+            >
               推广人
             </el-button>
-            <el-button type="primary" text size="small" @click="">
+            <el-button
+              type="primary"
+              text
+              size="small"
+              @click="openDataDrawer(row.id, 'order')"
+            >
               推广订单
             </el-button>
           </template>
@@ -146,20 +156,19 @@
         />
       </div>
     </el-card>
+
+    <dataDrawer ref="dataDrawerRef" />
+    <dataDrawer ref="orderDataDrawerRef" type="order" />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
-import {
-  getAgentList,
-  getUserBillList,
-  updateDistributionSetting,
-  getDistributionSetting,
-} from "~/api/distribution";
+import { getAgentList } from "~/api/distribution";
 import Panel from "./components/Panel.vue";
 import Search from "../../components/search.vue";
 import SearchItem from "../../components/SearchItem.vue";
+import dataDrawer from "./components/DataDrawer.vue";
 import { useInitTable } from "../../composables/useCommon";
 
 // 组件特有的搜索、get方法、get成功后的数据操作、修改状态、删除表格项
@@ -187,6 +196,13 @@ const {
   limit,
   getData,
 } = useInitTable(option);
+
+// 打开表单抽屉
+const dataDrawerRef = ref(null);
+const orderDataDrawerRef = ref(null);
+const openDataDrawer = (id, type) => {
+  (type == "user" ? dataDrawerRef : orderDataDrawerRef).value.open(id);
+};
 </script>
 
 <style scoped></style>

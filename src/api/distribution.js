@@ -14,20 +14,14 @@ export function getAgentList(page, query = {}) {
 }
 
 // 推广订单列表
-export function getUserBillList(
-  page,
-  query = {
-    type: "all",
-    starttime: "",
-    endtime: "",
-  }
-) {
-  return axios.get(`/admin/agent/${page}`, { params: query });
+export function getAgentOrderList(page, query = {}) {
+  let r = queryParams(query);
+  return axios.get(`/admin/user_bill/${page}${r}`);
 }
 
 // 修改分销配置
 export function updateDistributionSetting(data) {
-  return axios.post("/admin/distribution_setting/set");
+  return axios.post("/admin/distribution_setting/set", data);
 }
 
 // 获取分销配置
